@@ -2,57 +2,58 @@
 
 import React, { useState } from 'react';
 import { Search, Crosshair, AlertCircle } from 'lucide-react';
-import PlayerStatsCard from '@/components/PlayerStatsCard'; // 引入我们刚刚写的卡片组件
-import { ProcessedPlayerStats, ApiResponse } from '@/lib/types'; // 引入类型定义
+import PlayerStatsCard from '@/components/PlayerStatsCard';
+import { ProcessedPlayerStats, ApiResponse } from '@/lib/types';
 
 export default function Home() {
-  // --- 状态管理 (State Machine) ---
   const [searchInput, setSearchInput] = useState('');
   const [currentPlayer, setCurrentPlayer] = useState('');
   const [playerData, setPlayerData] = useState<ProcessedPlayerStats['squad'] | null>(null);
-  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // --- 核心交互逻辑：处理搜索 ---
   const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault(); // 阻止表单默认的刷新页面的行为
-    
-    const query = searchInput.trim();
-    if (!query) return;
+    e.preventDefault();
 
-    // 重置状态，准备发起请求
+    const query = searchInput.trim();
+    if (!query) {
+      setError('请输入玩家名称');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setCurrentPlayer(query);
     setPlayerData(null);
 
     try {
-      // 调用我们第二阶段写的 Next.js 后端 API
       const response = await fetch(`/api/stats/${encodeURIComponent(query)}`);
-      
-      // 解析我们定义的标准 ApiResponse
       const result: ApiResponse<ProcessedPlayerStats> = await response.json();
 
       if (!response.ok || !result.success) {
         throw new Error(result.error || '未找到该玩家或服务器繁忙');
       }
 
-      // 成功获取数据，更新状态
-      setPlayerData(result.data!.squad);
-
-    } catch (err: any) {
+      // 安全取值：使用可选链替代非空断言
+      if (result.data) {
+        setPlayerData(result.data.squad);
+      } else {
+        throw new Error('返回数据为空');
+      }
+    } catch (err: unknown) {
       console.error('Search failed:', err);
-      setError(err.message || '网络请求失败，请稍后再试');
+      const message =
+        err instanceof Error
+          ? err.message
+          : '网络请求失败，请稍后再试';
+      setError(message);
     } finally {
-      // 无论成功还是失败，都结束加载状态
       setIsLoading(false);
     }
   };
 
   return (
     <main className="min-h-screen bg-black text-zinc-100 selection:bg-amber-500/30">
-      {/* 顶部导航条 / 品牌标识 */}
       <header className="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center space-x-3">
           <Crosshair className="w-6 h-6 text-amber-500" />
@@ -61,7 +62,6 @@ export default function Home() {
       </header>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        {/* 英雄区域 (Hero Section) */}
         <div className="text-center mb-12 space-y-4">
           <h1 className="text-4xl md:text-5xl font-black tracking-tighter">
             追踪你的<span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">战场数据</span>
@@ -71,7 +71,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* 搜索表单 */}
         <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto mb-16 group">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search className={`w-5 h-5 transition-colors ${isLoading ? 'text-amber-500 animate-pulse' : 'text-zinc-500 group-focus-within:text-amber-500'}`} />
@@ -93,7 +92,6 @@ export default function Home() {
           </button>
         </form>
 
-        {/* 错误提示区域 */}
         {error && (
           <div className="max-w-4xl mx-auto mb-8 p-4 bg-red-950/30 border border-red-900/50 rounded-xl flex items-center space-x-3 animate-in fade-in slide-in-from-bottom-4">
             <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
@@ -101,13 +99,12 @@ export default function Home() {
           </div>
         )}
 
-        {/* 数据展示区域：按需渲染骨架屏或真实数据 */}
         {(isLoading || playerData) && !error && (
           <div className="animate-in fade-in slide-in-from-bottom-8 duration-500">
-            <PlayerStatsCard 
-              playerName={currentPlayer} 
-              stats={playerData} 
-              isLoading={isLoading} 
+            <PlayerStatsCard
+              playerName={currentPlayer}
+              stats={playerData}
+              isLoading={isLoading}
             />
           </div>
         )}

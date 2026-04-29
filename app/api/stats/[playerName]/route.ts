@@ -9,61 +9,90 @@ import { fetchRawPubgData, cleanAndFixPlayerStats } from '@/lib/services/pubg.se
 const redis = Redis.fromEnv();
 const CACHE_TTL = 600; // 缓存 10 分钟 (600秒)
 
+/** 校验玩家名称：只允许字母、数字、下划线和短横线 */
+function isValidPlayerName(name: string): boolean {
+  return /^[a-zA-Z0-9_-]{2,50}$/.test(name);
+}
+
 export async function GET(
   request: Request,
-  { params }: { params: { playerName: string } }
+  /** Next.js 15+ params 为 Promise 类型 */
+  context: { params: Promise<{ playerName: string }> }
 ) {
-  const { playerName } = params;
-  const sessionId = crypto.randomUUID(); // 生成可追溯的日志 ID
+  const { playerName } = await context.params;
+  const sessionId = crypto.randomUUID();
+
+  // 输入校验
+  if (!isValidPlayerName(playerName)) {
+    return NextResponse.json<ApiResponse<null>>(
+      {
+        success: false,
+        data: null,
+        error: '玩家名称格式不正确（仅支持字母、数字、下划线、短横线，2-50 个字符）',
+        sessionId,
+      },
+      { status: 400 }
+    );
+  }
 
   try {
-    // 【步骤 1】: 尝试从 Redis 缓存中读取数据
+    // 步骤 1: 尝试从 Redis 缓存中读取数据
     const cacheKey = `pubg:stats:${playerName.toLowerCase()}`;
     const cachedData = await redis.get<ProcessedPlayerStats>(cacheKey);
 
     if (cachedData) {
       console.log(`[Cache Hit] Player: ${playerName}`);
-      // 命中缓存，直接极速返回
       return NextResponse.json<ApiResponse<ProcessedPlayerStats>>({
         success: true,
         data: cachedData,
         sessionId,
-        _source: 'cache'
+        _source: 'cache',
       });
     }
 
     console.log(`[Cache Miss] Player: ${playerName}. Fetching from API...`);
 
-    // 【步骤 2】: 未命中缓存，向 PUBG 官方服务器请求数据
+    // 步骤 2: 请求 PUBG 官方 API
     const rawData = await fetchRawPubgData(playerName);
 
-    // 【步骤 3】: 将官方原始数据通过管道进行清洗和修复
+    // 步骤 3: 数据清洗
     const cleanedData = cleanAndFixPlayerStats(rawData);
 
-    // 【步骤 4】: 将清洗后完美的 JSON 存入 Redis，并设置过期时间
-    // 注意：用 ex 限制时间极其重要，否则你的服务器内存迟早会爆
+    // 步骤 4: 写入缓存
     await redis.setex(cacheKey, CACHE_TTL, cleanedData);
 
-    // 【步骤 5】: 返回数据给前端
+    // 步骤 5: 返回数据
     return NextResponse.json<ApiResponse<ProcessedPlayerStats>>({
       success: true,
       data: cleanedData,
       sessionId,
-      _source: 'api'
+      _source: 'api',
     });
+  } catch (error: unknown) {
+    console.error(`[Error] Failed to fetch stats for ${playerName}:`, error);
 
-  } catch (error: any) {
-    // 【兜底处理】: 无论是网络超时、解析错误，保证系统不崩溃
-    console.error(`[Error] Failed to fetch stats for ${playerName}`, error);
-    
+    // 识别已知错误类型并返回对应 HTTP 状态码
+    let statusCode = 500;
+    let errorMessage = '获取玩家数据失败';
+
+    if (error && typeof error === 'object') {
+      const err = error as Record<string, unknown>;
+      if (typeof err.status === 'number') {
+        statusCode = err.status;
+      }
+      if (typeof err.message === 'string') {
+        errorMessage = err.message;
+      }
+    }
+
     return NextResponse.json<ApiResponse<null>>(
       {
         success: false,
         data: null,
-        error: error.message || "Failed to fetch player stats.",
-        sessionId
+        error: errorMessage,
+        sessionId,
       },
-      { status: 500 } // 可以根据具体错误类型返回 404 (没找到人) 或 429 (官方限流)
+      { status: statusCode }
     );
   }
 }
