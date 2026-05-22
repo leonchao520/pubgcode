@@ -96,30 +96,23 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
     : (rankedData?.avgRank && rankedData.avgRank > 0) ? rankedData.avgRank
     : (lifetimeStats?.avgRank && lifetimeStats.avgRank > 0) ? lifetimeStats.avgRank : null;
 
-  // K/D：kills / (matches - wins)，赛季≥5场用赛季，否则生涯，生涯为0则汇总赛季
+  // K/D 和 场均伤害：优先竞技 > 普通赛季 > 生涯 > 汇总兜底
   const calcKD = (kills: number, matches: number, wins: number) => {
     const deaths = matches - (wins || 0);
     return deaths > 0 ? (kills / deaths).toFixed(2) : kills > 0 ? String(kills) : "?";
   };
-  const seasonKD = seasonStats?.matches && seasonStats.matches >= 5
-    ? calcKD(seasonStats.kills, seasonStats.matches, seasonStats.wins) : null;
-  const lifetimeKD = lifetimeStats?.matches && lifetimeStats.matches > 0
-    ? calcKD(lifetimeStats.kills, lifetimeStats.matches, lifetimeStats.wins) : null;
-  // 汇总赛季数据（生涯全0时的兜底）
-  const allSeasonKills = nsModes.reduce((s, [,v]) => s + (v.kills || 0), 0) + Object.values(rankedStats?.stats || {}).reduce((s, v) => s + (v.kills || 0), 0);
-  const allSeasonMatches = nsModes.reduce((s, [,v]) => s + (v.matches || 0), 0) + Object.values(rankedStats?.stats || {}).reduce((s, v) => s + (v.matches || 0), 0);
-  const allSeasonWins = nsModes.reduce((s, [,v]) => s + (v.wins || 0), 0) + Object.values(rankedStats?.stats || {}).reduce((s, v) => s + (v.wins || 0), 0);
-  const fallbackKD = allSeasonMatches > 0 ? calcKD(allSeasonKills, allSeasonMatches, allSeasonWins) : "?";
-  const kd = seasonKD || lifetimeKD || fallbackKD;
+  const getKD = (s: any) => s?.matches >= 5 ? calcKD(s.kills, s.matches, s.wins) : null;
+  const getAvgDmg = (s: any) => s?.matches >= 5 ? Math.round(s.damageDealt / s.matches) : null;
 
-  // 场均伤害（≥5场用赛季，否则生涯，生涯为0汇总赛季）
-  const seasonAvgDmg = seasonStats?.matches && seasonStats.matches >= 5
-    ? Math.round(seasonStats.damageDealt / seasonStats.matches) : null;
-  const lifetimeAvgDmg = lifetimeStats?.matches && lifetimeStats.matches > 0
-    ? Math.round(lifetimeStats.damageDealt / lifetimeStats.matches) : null;
-  const allSeasonDmg = nsModes.reduce((s, [,v]) => s + (v.damageDealt || 0), 0) + Object.values(rankedStats?.stats || {}).reduce((s, v) => s + (v.damageDealt || 0), 0);
-  const fallbackAvgDmg = allSeasonMatches > 0 ? Math.round(allSeasonDmg / allSeasonMatches) : null;
-  const avgDamage = seasonAvgDmg || lifetimeAvgDmg || fallbackAvgDmg;
+  // 汇总赛季数据（所有模式）
+  const allKills = nsModes.reduce((s, [,v]) => s + (v.kills || 0), 0) + Object.values(rankedStats?.stats || {}).reduce((s, v) => s + (v.kills || 0), 0);
+  const allMatches = nsModes.reduce((s, [,v]) => s + (v.matches || 0), 0) + Object.values(rankedStats?.stats || {}).reduce((s, v) => s + (v.matches || 0), 0);
+  const allWins = nsModes.reduce((s, [,v]) => s + (v.wins || 0), 0) + Object.values(rankedStats?.stats || {}).reduce((s, v) => s + (v.wins || 0), 0);
+  const allDmg = nsModes.reduce((s, [,v]) => s + (v.damageDealt || 0), 0) + Object.values(rankedStats?.stats || {}).reduce((s, v) => s + (v.damageDealt || 0), 0);
+
+  // 优先级：竞技 > 普通赛季 > 生涯 > 汇总
+  const kd = getKD(rankedData) || getKD(seasonStats) || getKD(lifetimeStats) || (allMatches > 0 ? calcKD(allKills, allMatches, allWins) : "?");
+  const avgDamage = getAvgDmg(rankedData) || getAvgDmg(seasonStats) || getAvgDmg(lifetimeStats) || (allMatches > 0 ? Math.round(allDmg / allMatches) : null);
 
   // 总场次：优先 survivalMastery.totalMatchesPlayed（生涯总计），兜底 lifetimeStats.matches
   const totalMatches = survivalMastery?.totalMatchesPlayed || lifetimeStats?.matches || 0;
