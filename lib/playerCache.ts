@@ -8,27 +8,27 @@ const MASTERY_CACHE_TTL = 86400; // 24 小时
 /** 缓存 survivalMastery */
 export async function getCachedSurvivalMastery(playerId: string) {
   const key = `m:survival:${playerId}`;
-  const cached = await getCached(key);
-  if (cached) return JSON.parse(cached as string);
+  const cached = await getCached<string>(key);
+  if (cached) return JSON.parse(cached);
   return null;
 }
 
 export async function setCachedSurvivalMastery(playerId: string, data: any) {
   const key = `m:survival:${playerId}`;
-  await setCached(key, JSON.stringify(data), MASTERY_CACHE_TTL);
+  await setCached(key, JSON.stringify(data));
 }
 
 /** 缓存 weaponMastery */
 export async function getCachedWeaponMastery(playerId: string) {
   const key = `m:weapon:${playerId}`;
-  const cached = await getCached(key);
-  if (cached) return JSON.parse(cached as string);
+  const cached = await getCached<string>(key);
+  if (cached) return JSON.parse(cached);
   return null;
 }
 
 export async function setCachedWeaponMastery(playerId: string, data: any) {
   const key = `m:weapon:${playerId}`;
-  await setCached(key, JSON.stringify(data), MASTERY_CACHE_TTL);
+  await setCached(key, JSON.stringify(data));
 }
 
 /** 从 DB 读取玩家扩展缓存（mastery 等 JSON 数据） */
@@ -58,7 +58,7 @@ export async function setPlayerCache(playerId: string, data: Record<string, any>
   try {
     const json = JSON.stringify(data);
     // Redis
-    await setCached(`pcache:${playerId}`, json, 86400);
+    await setCached(`pcache:${playerId}`, json);
     // DB (upsert)
     await prisma.playerCache.upsert({
       where: { playerId },
