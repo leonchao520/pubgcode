@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { QueryResult } from "@/lib/query";
-import { getSurvivalLevel, getTierColor, getTierLabel, getSubTierLabel, getTierImage } from "./PlayerHelpers";
+import type { GameModeStats } from "@/lib/pubg";
+import { getSurvivalLevel, getTierLabel, getSubTierLabel, getTierImage } from "./PlayerHelpers";
 import StatsPanel from "./StatsPanel";
 
 /* ═══════════════════════════════════════════
@@ -68,6 +69,8 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
     }
     setError("");
     setLoading(true);
+    setSelectedSeasonId(undefined);
+    setSeasonResult(null);
     router.push(`/player/${encodeURIComponent(q)}`);
     fetch(`/api/query?q=${encodeURIComponent(q)}`)
       .then(r => r.json())
@@ -93,11 +96,11 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
   }
 
   // 合并赛季数据
-  const seasonDisplayResult = selectedSeasonId ? ({
+  const seasonDisplayResult: QueryResult | null = selectedSeasonId && seasonResult ? ({
     ...result,
-    normalStats: seasonResult?.normalStats,
-    rankedStats: seasonResult?.rankedStats,
-  }) : result;
+    normalStats: seasonResult.normalStats,
+    rankedStats: seasonResult.rankedStats,
+  } as QueryResult) : result;
 
   // 段位数据
   const rankedModeEntry = rankedStats ? Object.entries(rankedStats.stats)[0] : null;
@@ -125,8 +128,8 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
     const deaths = matches - (wins || 0);
     return deaths > 0 ? (kills / deaths).toFixed(2) : kills > 0 ? String(kills) : "?";
   };
-  const getKD = (s: any) => s?.matches >= 5 ? calcKD(s.kills, s.matches, s.wins) : null;
-  const getAvgDmg = (s: any) => s?.matches >= 5 ? Math.round(s.damageDealt / s.matches) : null;
+  const getKD = (s: GameModeStats | null | undefined) => s?.matches && s.matches >= 5 ? calcKD(s.kills, s.matches, s.wins) : null;
+  const getAvgDmg = (s: GameModeStats | null | undefined) => s?.matches && s.matches >= 5 ? Math.round(s.damageDealt / s.matches) : null;
 
   // 汇总赛季数据（所有模式）
   const allKills = nsModes.reduce((s, [,v]) => s + (v.kills || 0), 0) + Object.values(rankedStats?.stats || {}).reduce((s, v) => s + (v.kills || 0), 0);
@@ -395,7 +398,7 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
               </div>
             ) : (
               <StatsPanel
-                result={seasonDisplayResult as QueryResult}
+                result={seasonDisplayResult!}
                 onSeasonChange={handleSeasonChange}
               />
             )}
@@ -619,17 +622,9 @@ const st: Record<string, React.CSSProperties> = {
   rankLeft: {
     display: "flex", alignItems: "center", gap: "14px",
   },
-  rankIconWrap: {
-    width: "56px", height: "56px", borderRadius: "12px",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    flexShrink: 0,
-  },
   rankIcon: {
     width: "56px", height: "56px", borderRadius: "12px",
     flexShrink: 0,
-  },
-  rankIconLabel: {
-    fontSize: "20px", fontWeight: 700, color: "#000",
   },
   rankName: {
     fontSize: "22px", fontWeight: 700, color: "#fff",
