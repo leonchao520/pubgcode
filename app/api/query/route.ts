@@ -44,6 +44,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "签名校验失败" }, { status: 403 });
   }
 
+  // Referer / Origin 校验 — 只允许本站和本地请求
+  const referer = req.headers.get("referer") || "";
+  const origin = req.headers.get("origin") || "";
+  const host = req.headers.get("host") || "";
+  const isSelfRequest = !origin && !referer; // 本地/同源无头请求
+  const isOurDomain = referer.includes(host) || origin.includes(host);
+  if (!isSelfRequest && !isOurDomain) {
+    return NextResponse.json({ error: "不允许的跨域请求" }, { status: 403 });
+  }
+
   // Rate limiting — 基于真实 IP
   const ip = getClientIp(req);
   const ratelimit = await getRatelimit();
