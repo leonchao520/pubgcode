@@ -7,6 +7,9 @@ import type { GameModeStats } from "@/lib/pubg";
 import { getSurvivalLevel, getTierLabel, getSubTierLabel, getTierImage } from "./PlayerHelpers";
 import { signParams } from "@/lib/sign-client";
 import StatsPanel from "./StatsPanel";
+import MatchHistory from "./MatchHistory";
+import MatchDetailModal from "./MatchDetailModal";
+import type { MatchSummary } from "@/lib/pubg";
 
 /* ═══════════════════════════════════════════
    玩家战绩总览页 — /player/[name]
@@ -39,6 +42,7 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
   const [seasonLoading, setSeasonLoading] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favHydrated, setFavHydrated] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<MatchSummary | null>(null);
 
   useEffect(() => {
     setFavorites(loadFavorites());
@@ -160,6 +164,7 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
   };
 
   return (
+    <>
     <div style={st.page}>
       <div style={st.container}>
         {/* ─── 搜索栏 ──────────────── */}
@@ -410,6 +415,19 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
           </div>
         )}
 
+        {/* ─── 战绩 Tab ──────────── */}
+        {result && !loading && pubg && activeTab === "matches" && (
+          <div style={st.content}>
+            {recentMatches && recentMatches.length > 0 ? (
+              <MatchHistory matches={recentMatches} onSelectMatch={setSelectedMatch} />
+            ) : (
+              <div style={st.card}>
+                <div style={st.emptyNote}>暂无近期对局数据</div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* 暂无数据 */}
         {!loading && result?.error && (
           <div style={st.card}>
@@ -423,6 +441,10 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
         )}
       </div>
     </div>
+    {selectedMatch && (
+      <MatchDetailModal match={selectedMatch} onClose={() => setSelectedMatch(null)} />
+    )}
+    </>
   );
 }
 
