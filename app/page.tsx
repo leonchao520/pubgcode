@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, CSSProperties, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import type { QueryResult } from "@/lib/query";
 import OverviewTab from "@/components/OverviewTab";
 import StatsPanel from "@/components/StatsPanel";
@@ -29,6 +30,7 @@ function useRecentExamples(): { examples: string[]; hydrated: boolean } {
 
 export default function HomePage() {
   const [input, setInput] = useState("");
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<QueryResult | null>(null);
@@ -98,7 +100,8 @@ export default function HomePage() {
       setError("请输入玩家昵称或 17 位 Steam ID");
       return;
     }
-    window.location.href = `/player/${encodeURIComponent(q)}`;
+    router.push(`/player/${encodeURIComponent(q)}`);
+    fetchResult(q);
   }
 
   function handleSeasonChange(seasonId: string) {
@@ -115,12 +118,11 @@ export default function HomePage() {
   const restoreFromUrl = useCallback((path: string) => {
     const match = path.match(/^\/result\/(.+)/);
     if (match) {
-      // 旧版 /result 路径重定向到新的 /player 页面
       const full = decodeURIComponent(match[1]);
       const [name] = full.split("?");
-      window.location.href = `/player/${encodeURIComponent(name)}`;
+      router.push(`/player/${encodeURIComponent(name)}`);
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const path = window.location.pathname + window.location.search;
@@ -234,7 +236,7 @@ export default function HomePage() {
             <span style={lg.examplesLabel}>{hydrated && examples[0] !== EXAMPLES[0] ? "最近查询：" : "示例："}</span>
             {examples.map((ex) => (
               <button key={ex}
-                onClick={() => { window.location.href = `/player/${encodeURIComponent(ex)}`; }}
+                onClick={() => { setInput(ex); handleSubmit(); }}
                 style={lg.exampleBtn}>{ex}</button>
             ))}
           </div>
