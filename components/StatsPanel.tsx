@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import type { QueryResult } from "@/lib/query";
 import type { GameModeStats, LifetimeStats } from "@/lib/pubg";
+import { getTierImage, getTierLabel, getSubTierLabel } from "./PlayerHelpers";
 
 const MODE_LABELS: Record<string, string> = {
   "squad-fpp": "四排 FPP", "squad": "四排 TPP",
@@ -11,531 +11,382 @@ const MODE_LABELS: Record<string, string> = {
   "solo-fpp": "单排 FPP", "solo": "单排 TPP",
 };
 
-type TabType = "normal" | "ranked" | "lifetime";
+type TabType = "ranked" | "normal" | "lifetime";
+
+/* ─── 小控件 ─────────────────────────────── */
 
 function StatBox({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
-    <div style={s.statBox}>
-      <div style={s.statLabel}>{label}</div>
-      <div style={{ ...s.statValue, color: color || "#fff" }}>{value}</div>
+    <div style={st.statBox}>
+      <div style={st.statValue} data-color={color}>{value}</div>
+      <div style={st.statLabel}>{label}</div>
     </div>
   );
 }
 
-function ProgressBar({ label, value, max, unit, color }: {
-  label: string; value: number; max: number; unit: string; color: string;
-}) {
-  const pct = Math.min((value / max) * 100, 100);
+function TierBadge({ tier, subTier, rankPoints }: { tier: string; subTier: string; rankPoints: number }) {
   return (
-    <div style={{ marginBottom: "12px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-        <span style={s.progressLabel}>{label}</span>
-        <span style={{ ...s.progressValue, color }}>{value.toLocaleString()}{unit}</span>
-      </div>
-      <div style={s.progressTrack}>
-        <div style={{ ...s.progressFill, width: `${pct}%`, background: color }} />
+    <div style={st.tierHero}>
+      <img src={getTierImage(tier, subTier)} alt="" style={st.tierImg} />
+      <div style={st.tierInfo}>
+        <div style={st.tierName}>{getTierLabel(tier)} {getSubTierLabel(subTier)}</div>
+        <div style={st.tierRp}><span style={{ color: "#d4a030" }}>{rankPoints}</span> RP</div>
       </div>
     </div>
   );
 }
 
-function getTierColor(tier: string): string {
-  const t = tier.toLowerCase();
-  if (t.includes("bronze")) return "#8B5E3C";
-  if (t.includes("silver")) return "#888";
-  if (t.includes("gold")) return "#D4A030";
-  if (t.includes("platinum")) return "#40C9FF";
-  if (t.includes("diamond")) return "#185ABD";
-  if (t.includes("master")) return "#C4A6FF";
-  if (t.includes("survivor")) return "#FF4D4D";
-  return "#d4a030";
-}
-
-function getTierLabel(tier: string): string {
-  const map: Record<string, string> = {
-    Survivor: "生存者", Master: "大师", Diamond: "钻石",
-    Platinum: "铂金", Gold: "黄金", Silver: "白银", Bronze: "青铜",
-  };
-  return map[tier] || tier;
-}
-
-function getSubTierLabel(subTier: string): string {
-  const map: Record<string, string> = { "1": "Ⅰ", "2": "Ⅱ", "3": "Ⅲ", "4": "Ⅳ", "5": "Ⅴ" };
-  return map[subTier] || subTier;
-}
+/* ═══════════════════════════════════════════
+   StatsPanel — 模仿 pubg.plus 赛季页面
+   ═══════════════════════════════════════════ */
 
 export default function StatsPanel({ result, onSeasonChange: onSeasonCb }: {
   result: QueryResult;
   onSeasonChange?: (seasonId: string) => void;
 }) {
-  const { pubg, steam, seasons, normalStats, rankedStats, lifetimeStats } = result;
-  const [tab, setTab] = useState<TabType>("normal");
-  const [selectedMode, setSelectedMode] = useState<string>("squad-fpp");
-  const router = useRouter();
+  const { pubg, seasons, normalStats, rankedStats, lifetimeStats } = result;
+  const [tab, setTab] = useState<TabType>("ranked");
+  const [seasonIdx, setSeasonIdx] = useState(-1); // -1 = 当前赛季
 
-  // 选择 season
-  function onSeasonChange(sid: string) {
-    if (onSeasonCb) {
-      // SPA 模式：回调给父组件处理
-      onSeasonCb(sid === "auto" ? "" : sid);
-      return;
-    }
-    // SSR 模式：跳转页面
-    if (sid === "auto") {
-      router.push(`/result/${encodeURIComponent(result.input)}`);
-    } else {
-      router.push(`/result/${encodeURIComponent(result.input)}?season=${sid}`);
-    }
-  }
+  // 有 ranked 数据默认选 ranked，否则 normal，否则 lifetime
+  useEffect(() => {
+    const hasRanked = rankedStats && Object.keys(rankedStats.stats).length > 0;
+    const hasNormal = normalStats && Object.keys(normalStats.stats).length > 0;
+    if (hasRanked) setTab("ranked");
+    else if (hasNormal) setTab("normal");
+    else if (lifetimeStats?.matches) setTab("lifetime");
+  }, []);
 
   if (!pubg) return null;
 
-  // 获取所有有数据的模式
-  const allModes = normalStats ? Object.keys(normalStats.stats) : [];
-  
-  // 如果普通/竞技没有数据但有生涯数据，自动切到生涯
-  useEffect(() => {
-    if (tab === "normal" && allModes.length === 0 && lifetimeStats) {
-      setTab("lifetime");
-    }
-  }, [tab, allModes.length]);
-  
-  // 选当前 tab 的数据
-  let modeData: GameModeStats | null = null;
-  let tierData: { currentTier: { tier: string; subTier: string }; rankPoints: number } | null = null;
+  const seasonList = seasons || [];
+  const currentSeason = seasonList[seasonIdx] || seasonList.find(s => s.isCurrentSeason);
+  const hasPrev = seasonIdx < seasonList.length - 1;
+  const hasNext = seasonIdx > -1;
 
-  if (tab === "normal" && normalStats) {
-    modeData = normalStats.stats[selectedMode] || Object.values(normalStats.stats)[0] || null;
-  } else if (tab === "ranked" && rankedStats) {
-    const r = Object.values(rankedStats.stats)[0];
-    if (r) {
-      modeData = r;
-      tierData = { currentTier: r.currentTier, rankPoints: r.rankPoints };
-    }
+  function goSeason(delta: number) {
+    const next = seasonIdx + delta;
+    if (next < -1 || next >= seasonList.length) return;
+    setSeasonIdx(next);
+    const sid = next === -1 ? "" : seasonList[next]?.id || "";
+    onSeasonCb?.(sid);
   }
 
-  // 根据有数据的模式自动选第一个
-  const availableNormalModes = normalStats ? Object.keys(normalStats.stats) : [];
+  // 当前 tab 数据
+  let rankedModes: [string, GameModeStats & { currentTier?: { tier: string; subTier: string }; rankPoints?: number }][] = [];
+  let normalModes: [string, GameModeStats][] = [];
+  let lifetime: LifetimeStats | null = null;
+
+  if (tab === "ranked" && rankedStats) {
+    rankedModes = Object.entries(rankedStats.stats);
+  } else if (tab === "normal" && normalStats) {
+    normalModes = Object.entries(normalStats.stats).filter(([,s]) => s.matches > 0);
+    // 按场次排序
+    normalModes.sort((a, b) => (b[1].matches || 0) - (a[1].matches || 0));
+  } else if (tab === "lifetime") {
+    lifetime = lifetimeStats || null;
+  }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      {/* 赛季 + 模式选择 */}
-      {seasons && seasons.length > 0 && (
-        <div style={s.card}>
-          <div style={s.selectRow}>
-            <span style={s.selectLabel}>赛季</span>
-            <select
-              onChange={(e) => onSeasonChange(e.target.value)}
-              style={s.select}
-              defaultValue="auto"
-            >
-              <option value="auto">当前赛季（自动）</option>
-              {seasons.map((season) => (
-                <option key={season.id} value={season.id}>
-                  {season.displayName} {season.isCurrentSeason ? "(当前)" : ""}
-                </option>
-              ))}
-            </select>
-            
-            <span style={s.selectDivider} />
-            
-            <span style={s.selectLabel}>模式</span>
-            <select
-              value={selectedMode}
-              onChange={(e) => setSelectedMode(e.target.value)}
-              style={s.select}
-            >
-              <option value="squad-fpp">四排 FPP</option>
-              <option value="squad">四排 TPP</option>
-              <option value="duo-fpp">双排 FPP</option>
-              <option value="duo">双排 TPP</option>
-              <option value="solo-fpp">单排 FPP</option>
-              <option value="solo">单排 TPP</option>
-            </select>
-            
-            <span style={s.selectDivider} />
-            
-            <span style={s.selectLabel}>类型</span>
-            <div style={{ display: "flex", gap: "4px" }}>
-              {(["normal", "ranked", "lifetime"] as const).map((t) => (
-                <button key={t} onClick={() => setTab(t)}
-                  style={tab === t ? s.typeBtnActive : s.typeBtn}>
-                  {{ normal: "普通", ranked: "竞技", lifetime: "生涯" }[t]}
-                </button>
-              ))}
-            </div>
+    <div style={sc.wrap}>
+      {/* ─── 赛季导航 ──────── */}
+      <div style={sc.seasonNav}>
+        <button onClick={() => goSeason(1)} disabled={!hasPrev} style={navBtn(!hasPrev)}>
+          ‹ 上赛季
+        </button>
+        <div style={sc.seasonCenter}>
+          <div style={sc.seasonName}>
+            {currentSeason?.displayName || "当前赛季"}
           </div>
+          {currentSeason?.isCurrentSeason && <span style={sc.seasonBadge}>进行中</span>}
         </div>
-      )}
-
-      {/* 数据展示 */}
-      <div style={s.card}>
-        {/* 段位信息（竞技模式） */}
-        {tab === "ranked" && tierData && modeData && (
-          <div style={s2.rankedHeader}>
-            <div style={{
-              ...s2.tierBadge,
-              background: getTierColor(tierData.currentTier.tier),
-            }}>
-              <div style={s2.tierName}>{getTierLabel(tierData.currentTier.tier)}</div>
-              <div style={s2.tierSub}>{getSubTierLabel(tierData.currentTier.subTier)}</div>
-            </div>
-            <div style={s2.rankedStats}>
-              <div style={s2.rpValue}>{tierData.rankPoints}</div>
-              <div style={s2.rpLabel}>RP</div>
-            </div>
-            <div style={{ flex: 1 }} />
-            <div style={s2.rankedQuick}>
-              <div style={s2.quickItem}>
-                <div style={s2.quickValue}>#{modeData.avgRank?.toFixed(1) || "?"}</div>
-                <div style={s2.quickLabel}>平均排名</div>
-              </div>
-              <div style={s2.quickItem}>
-                <div style={{...s2.quickValue, color: "#d4a030"}}>{modeData.kda.toFixed(2)}</div>
-                <div style={s2.quickLabel}>K/D</div>
-              </div>
-              <div style={s2.quickItem}>
-                <div style={s2.quickValue}>{modeData.matches}</div>
-                <div style={s2.quickLabel}>场次</div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 数据展示 */}
-        {modeData && tab !== "lifetime" && <StatsGrid stats={modeData} />}
-        {!modeData && tab === "normal" && (
-          <div style={{ padding: "32px 20px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
-            该玩家本赛季暂无普通模式数据
-          </div>
-        )}
-        {!modeData && tab === "ranked" && (
-          <div style={{ padding: "32px 20px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
-            该玩家本赛季暂无竞技模式数据
-          </div>
-        )}
-        {tab === "lifetime" && lifetimeStats && (
-          <LifetimePanel stats={lifetimeStats} />
-        )}
-        {tab === "lifetime" && !lifetimeStats && (
-          <div style={{ padding: "24px", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
-            暂无生涯数据
-          </div>
-        )}
+        <button onClick={() => goSeason(-1)} disabled={!hasNext} style={navBtn(!hasNext)}>
+          下赛季 ›
+        </button>
       </div>
 
-      {/* Steam */}
-      {steam && <SteamSection steam={steam} />}
+      {/* ─── 类型 Tab ──────── */}
+      <div style={sc.typeTabs}>
+        {(["ranked", "normal", "lifetime"] as const).map(t => (
+          <button key={t} onClick={() => setTab(t)} style={tab === t ? sc.typeActive : sc.typeBtn}>
+            {{ ranked: "竞技", normal: "普通", lifetime: "生涯" }[t]}
+          </button>
+        ))}
+      </div>
+
+      {/* ─── Ranked 模式 ──────── */}
+      {tab === "ranked" && rankedModes.length > 0 && rankedModes.map(([mode, s]) => (
+        <div key={mode} style={sc.card}>
+          <div style={sc.modeHeader}>
+            <span style={sc.modeTitle}>{MODE_LABELS[mode] || mode}</span>
+            <span style={sc.modeMeta}>{s.matches} 场</span>
+          </div>
+          {s.currentTier && (
+            <TierBadge tier={s.currentTier.tier} subTier={s.currentTier.subTier} rankPoints={s.rankPoints || 0} />
+          )}
+          <RankedGrid stats={s} />
+        </div>
+      ))}
+      {tab === "ranked" && rankedModes.length === 0 && <Empty text="暂无竞技模式数据" />}
+
+      {/* ─── Normal 模式 ──────── */}
+      {tab === "normal" && normalModes.length > 0 && normalModes.map(([mode, s]) => (
+        <div key={mode} style={sc.card}>
+          <div style={sc.modeHeader}>
+            <span style={sc.modeTitle}>{MODE_LABELS[mode] || mode}</span>
+            <span style={sc.modeMeta}>{s.matches} 场</span>
+          </div>
+          <NormalGrid stats={s} />
+        </div>
+      ))}
+      {tab === "normal" && normalModes.length === 0 && <Empty text="该赛季暂无普通模式数据" />}
+
+      {/* ─── Lifetime 模式 ──────── */}
+      {tab === "lifetime" && lifetime && lifetime.matches > 0 && (
+        <div style={sc.card}>
+          <div style={sc.modeHeader}>
+            <span style={sc.modeTitle}>生涯总览</span>
+            <span style={sc.modeMeta}>{lifetime.matches.toLocaleString()} 场</span>
+          </div>
+          <LifetimePanel stats={lifetime} />
+        </div>
+      )}
+      {tab === "lifetime" && (!lifetime || !lifetime.matches) && (
+        <Empty text="暂无生涯数据" subtitle="部分账号的生涯统计数据可能暂时不可用" />
+      )}
     </div>
   );
 }
 
-function StatsGrid({ stats }: { stats: GameModeStats }) {
-  if (!stats.matches) return null;
-  const avgDmg = stats.matches > 0 ? Math.round(stats.damageDealt / stats.matches) : 0;
-  const winRate = stats.matches > 0 ? ((stats.wins / stats.matches) * 100).toFixed(1) : "0";
-  const top10Rate = stats.matches > 0 ? ((stats.top10s / stats.matches) * 100).toFixed(1) : "0";
+/* ─── 数据网格 ────────────────────────────── */
+
+function RankedGrid({ stats: s }: { stats: GameModeStats & { rankPoints?: number } }) {
+  const avgDmg = s.matches > 0 ? Math.round(s.damageDealt / s.matches) : 0;
+  const winRate = s.matches > 0 ? ((s.wins / s.matches) * 100) : 0;
+  const top10Rate = s.matches > 0 ? ((s.top10s / s.matches) * 100) : 0;
+  const kd = s.matches > (s.wins || 0) ? (s.kills / (s.matches - (s.wins || 0))) : s.kills;
 
   return (
-    <>
-      <div style={s.sectionHeader}>赛季数据</div>
-      <div className="resp-grid-4" style={{ padding: "16px 20px" }}>
-        <StatBox label="K/D" value={stats.kda.toFixed(2)} color="#d4a030" />
-        <StatBox label="总击杀" value={stats.kills.toLocaleString()} />
-        <StatBox label="胜场" value={stats.wins.toLocaleString()} />
-        <StatBox label="助攻" value={stats.assists.toLocaleString()} />
+    <div style={sc.gridPad}>
+      <div className="resp-grid-3" style={{ gap: "6px" }}>
+        <StatBox label="K/D" value={kd.toFixed(2)} color="#d4a030" />
+        <StatBox label="场均伤害" value={avgDmg.toLocaleString()} color="#4ade80" />
+        <StatBox label="场均排名" value={s.avgRank > 0 ? `#${s.avgRank.toFixed(1)}` : "?"} />
       </div>
-      <div className="resp-grid-4" style={{ padding: "0 20px 8px" }}>
-        <StatBox label="场次" value={stats.matches.toLocaleString()} />
-        <StatBox label="胜率" value={`${winRate}%`} />
-        <StatBox label="Top10率" value={`${top10Rate}%`} />
-        <StatBox label="场均伤害" value={avgDmg.toLocaleString()} />
+      <div className="resp-grid-4" style={{ marginTop: "8px", gap: "6px" }}>
+        <StatBox label="击杀" value={s.kills.toLocaleString()} />
+        <StatBox label="胜场" value={s.wins.toLocaleString()} />
+        <StatBox label="胜率" value={`${winRate.toFixed(1)}%`} />
+        <StatBox label="Top10率" value={`${top10Rate.toFixed(1)}%`} />
       </div>
-      <div style={{ padding: "0 20px 16px" }}>
-        <ProgressBar label="K/D" value={stats.kda} max={6} unit="" color="#d4a030" />
-        <ProgressBar label="场均伤害" value={avgDmg} max={500} unit="" color="#4ade80" />
-        <ProgressBar label="Top10率" value={stats.top10s} max={stats.matches} unit="" color="#60a5fa" />
-      </div>
-    </>
+    </div>
   );
 }
 
-/* ─── 生涯数据面板（PUBG.HK 风格） ─────────── */
+function NormalGrid({ stats: s }: { stats: GameModeStats }) {
+  const avgDmg = s.matches > 0 ? Math.round(s.damageDealt / s.matches) : 0;
+  const winRate = s.matches > 0 ? ((s.wins / s.matches) * 100) : 0;
+  const top10Rate = s.matches > 0 ? ((s.top10s / s.matches) * 100) : 0;
+  const kd = s.matches > (s.wins || 0) ? (s.kills / (s.matches - (s.wins || 0))) : s.kills;
+
+  return (
+    <div style={sc.gridPad}>
+      <div className="resp-grid-3" style={{ gap: "6px" }}>
+        <StatBox label="K/D" value={kd.toFixed(2)} color="#d4a030" />
+        <StatBox label="场均伤害" value={avgDmg.toLocaleString()} color="#4ade80" />
+        <StatBox label="场次" value={s.matches.toLocaleString()} />
+      </div>
+      <div className="resp-grid-4" style={{ marginTop: "8px", gap: "6px" }}>
+        <StatBox label="击杀" value={s.kills.toLocaleString()} />
+        <StatBox label="胜场" value={s.wins.toLocaleString()} />
+        <StatBox label="助攻" value={s.assists.toLocaleString()} />
+        <StatBox label="最长击杀" value={`${s.longestKill}m`} />
+      </div>
+    </div>
+  );
+}
 
 function LifetimePanel({ stats: s }: { stats: LifetimeStats }) {
-  if (!s.matches) return null;
+  const avgDmg = Math.round(s.damageDealt / Math.max(s.matches, 1));
   const winRate = ((s.wins / s.matches) * 100).toFixed(1);
   const top10Rate = ((s.top10s / s.matches) * 100).toFixed(1);
-  const kd = s.kda.toFixed(2);
-  const avgDmg = Math.round(s.damageDealt / s.matches);
   const survivedHrs = Math.round(s.timeSurvived / 3600);
   const headshotRate = s.kills > 0 ? ((s.headshotKills / s.kills) * 100).toFixed(1) : "0";
 
   return (
-    <>
-      <div style={s2.sectionHeader}>生涯总览</div>
-
-      {/* 概览：核心 4 项 */}
-      <div className="resp-grid-4" style={{ padding: "16px 20px 10px" }}>
-        <BigStatBox label="总场次" value={s.matches.toLocaleString()} />
-        <BigStatBox label="胜率" value={`${winRate}%`} color="#4ade80" />
-        <BigStatBox label="Top10率" value={`${top10Rate}%`} color="#60a5fa" />
-        <BigStatBox label="K/D" value={kd} color="#d4a030" />
-      </div>
-
-      {/* 战斗 */}
-      <div style={s2.groupHeader}>⚔️ 战斗</div>
-      <div className="resp-grid-4" style={{ padding: "0 20px 8px" }}>
-        <StatBox label="击杀" value={s.kills.toLocaleString()} color="#d4a030" />
+    <div style={sc.gridPad}>
+      {/* ⚔️ 战斗 */}
+      <div style={sc.groupLabel}>⚔️ 战斗</div>
+      <div className="resp-grid-4" style={{ gap: "6px" }}>
+        <StatBox label="K/D" value={s.kda.toFixed(2)} color="#d4a030" />
+        <StatBox label="击杀" value={s.kills.toLocaleString()} />
         <StatBox label="胜场" value={s.wins.toLocaleString()} />
         <StatBox label="助攻" value={s.assists.toLocaleString()} />
-        <StatBox label="总伤害" value={s.damageDealt.toLocaleString()} />
       </div>
-
-      {/* 精准 */}
-      <div style={s2.groupHeader}>🎯 精准</div>
-      <div className="resp-grid-4" style={{ padding: "0 20px 8px" }}>
+      <div className="resp-grid-4" style={{ marginTop: "6px", gap: "6px" }}>
+        <StatBox label="胜率" value={`${winRate}%`} color="#4ade80" />
+        <StatBox label="Top10率" value={`${top10Rate}%`} color="#60a5fa" />
+        <StatBox label="总伤害" value={s.damageDealt.toLocaleString()} />
+        <StatBox label="场均伤害" value={avgDmg.toLocaleString()} />
+      </div>
+      {/* 🎯 精准 */}
+      <div style={{ ...sc.groupLabel, marginTop: "12px" }}>🎯 精准</div>
+      <div className="resp-grid-4" style={{ gap: "6px" }}>
         <StatBox label="爆头击杀" value={s.headshotKills.toLocaleString()} />
         <StatBox label="爆头率" value={`${headshotRate}%`} />
         <StatBox label="最长击杀" value={`${s.longestKill}m`} />
-        <StatBox label="场均伤害" value={avgDmg.toLocaleString()} />
-      </div>
-
-      {/* 生存 */}
-      <div style={s2.groupHeader}>⏱️ 生存</div>
-      <div className="resp-grid-4" style={{ padding: "0 20px 8px" }}>
-        <StatBox label="存活时长" value={`${survivedHrs}h`} color="#60a5fa" />
-        <StatBox label="Top10" value={s.top10s.toLocaleString()} />
-        <StatBox label="平均排名" value={s.avgRank && s.avgRank > 0 ? `#${s.avgRank.toFixed(1)}` : "?"} />
         <StatBox label="载具击杀" value={s.roadKills.toLocaleString()} />
       </div>
-
-      {/* 进度条 */}
-      <div style={{ padding: "8px 20px 16px" }}>
-        <ProgressBar label="K/D" value={s.kda} max={6} unit="" color="#d4a030" />
-        <ProgressBar label="场均伤害" value={avgDmg} max={500} unit="" color="#4ade80" />
-        <ProgressBar label="胜率" value={Number(winRate)} max={50} unit="%" color="#60a5fa" />
-      </div>
-    </>
-  );
-}
-
-function BigStatBox({ label, value, color }: { label: string; value: string; color?: string }) {
-  return (
-    <div style={s2.bigBox}>
-      <div style={s2.bigLabel}>{label}</div>
-      <div style={{ ...s2.bigValue, color: color || "#fff" }}>{value}</div>
-    </div>
-  );
-}
-
-function SteamSection({ steam }: { steam: NonNullable<QueryResult["steam"]> }) {
-  return (
-    <div style={s.card}>
-      <div style={s.sectionHeader}>Steam 游戏时长</div>
-      <div className="resp-grid-2" style={{ padding: "16px 20px" }}>
-        <StatBox label="PUBG 总时长" value={`${Math.floor(steam.pubgPlaytimeMinutes / 60).toLocaleString()}h`} color="#60a5fa" />
-        <StatBox label="近14天" value={`${Math.floor(steam.pubgPlaytime2wMinutes / 60)}h`} color="#60a5fa" />
-      </div>
-      <div style={{ padding: "0 20px 16px" }}>
-        <ProgressBar label="活跃度" value={steam.pubgPlaytime2wMinutes / 60} max={100} unit="h" color="#60a5fa" />
+      {/* ⏱️ 生存 */}
+      <div style={{ ...sc.groupLabel, marginTop: "12px" }}>⏱️ 生存</div>
+      <div className="resp-grid-4" style={{ gap: "6px" }}>
+        <StatBox label="存活时长" value={`${survivedHrs}h`} />
+        <StatBox label="Top10" value={s.top10s.toLocaleString()} />
+        <StatBox label="平均排名" value={s.avgRank > 0 ? `#${s.avgRank.toFixed(1)}` : "?"} />
+        <StatBox label="总场次" value={s.matches.toLocaleString()} />
       </div>
     </div>
   );
 }
 
-const s = {
+function Empty({ text, subtitle }: { text: string; subtitle?: string }) {
+  return (
+    <div style={sc.empty}>
+      <div style={sc.emptyIcon}>📭</div>
+      <div style={sc.emptyText}>{text}</div>
+      {subtitle && <div style={sc.emptySub}>{subtitle}</div>}
+    </div>
+  );
+}
+
+/* ─── 样式 ───────────────────────────────── */
+
+const navBtn = (disabled: boolean): React.CSSProperties => ({
+  padding: "6px 14px", fontSize: "12px",
+  background: "transparent", color: disabled ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.5)",
+  border: `1px solid ${disabled ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.1)"}`,
+  borderRadius: "6px", cursor: disabled ? "default" : "pointer",
+  fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+});
+
+const sc = {
+  wrap: { display: "flex", flexDirection: "column", gap: "10px" } as React.CSSProperties,
   card: {
-    background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)",
     borderRadius: "8px", overflow: "hidden",
   } as React.CSSProperties,
 
-  sectionHeader: {
-    padding: "14px 20px", fontSize: "13px", fontWeight: 600, color: "#fff",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
+  // 赛季导航
+  seasonNav: {
+    display: "flex", alignItems: "center", justifyContent: "space-between",
+    background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: "8px", padding: "12px 16px",
+  } as React.CSSProperties,
+  seasonCenter: {
+    display: "flex", flexDirection: "column", alignItems: "center", gap: "2px",
+  } as React.CSSProperties,
+  seasonName: {
+    fontSize: "15px", fontWeight: 700, color: "#fff",
+  } as React.CSSProperties,
+  seasonBadge: {
+    fontSize: "10px", color: "#4ade80", background: "rgba(74,222,128,0.1)",
+    padding: "1px 8px", borderRadius: "4px", fontWeight: 600,
   } as React.CSSProperties,
 
-  tabRow: {
-    display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)",
+  // 类型 Tab
+  typeTabs: {
+    display: "flex", gap: "4px", justifyContent: "center",
   } as React.CSSProperties,
-
-  selectDivider: { width: "1px", height: "20px", background: "rgba(255,255,255,0.08)" } as React.CSSProperties,
-
   typeBtn: {
-    padding: "6px 14px", background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.5)",
+    padding: "8px 24px", background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.45)",
     border: "1px solid rgba(255,255,255,0.06)", borderRadius: "6px",
-    fontSize: "12px", cursor: "pointer",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: "13px", cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   } as React.CSSProperties,
-
-  typeBtnActive: {
-    padding: "6px 14px", background: "rgba(212,160,48,0.12)", color: "#d4a030",
+  typeActive: {
+    padding: "8px 24px", background: "rgba(212,160,48,0.12)", color: "#d4a030",
     border: "1px solid rgba(212,160,48,0.3)", borderRadius: "6px",
-    fontSize: "12px", cursor: "pointer", fontWeight: 600,
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: "13px", cursor: "pointer", fontWeight: 600, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   } as React.CSSProperties,
 
-  tab: {
-    flex: 1, padding: "12px", background: "transparent", color: "rgba(255,255,255,0.45)",
-    border: "none", borderBottom: "2px solid transparent", fontSize: "13px",
-    cursor: "pointer", fontWeight: 500,
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  // 模式头部
+  modeHeader: {
+    display: "flex", justifyContent: "space-between", alignItems: "center",
+    padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)",
+  } as React.CSSProperties,
+  modeTitle: {
+    fontSize: "14px", fontWeight: 600, color: "#fff",
+  } as React.CSSProperties,
+  modeMeta: {
+    fontSize: "11px", color: "rgba(255,255,255,0.4)",
   } as React.CSSProperties,
 
-  tabActive: {
-    flex: 1, padding: "12px", background: "transparent", color: "#d4a030",
-    border: "none", borderBottom: "2px solid #d4a030", fontSize: "13px",
-    cursor: "pointer", fontWeight: 600,
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  } as React.CSSProperties,
-
-  selectRow: {
+  // 段位徽章
+  tierHero: {
     display: "flex", alignItems: "center", gap: "12px",
-    padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)",
+    padding: "0 16px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)",
   } as React.CSSProperties,
-
-  selectLabel: {
-    fontSize: "12px", color: "rgba(255,255,255,0.5)",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  tierImg: {
+    width: "48px", height: "48px", borderRadius: "8px",
   } as React.CSSProperties,
-
-  select: {
-    padding: "6px 12px", background: "rgba(255,255,255,0.04)", color: "#fff",
-    border: "1px solid rgba(255,255,255,0.1)", borderRadius: "6px",
-    fontSize: "13px", outline: "none",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  tierInfo: {
+    display: "flex", flexDirection: "column", gap: "2px",
   } as React.CSSProperties,
-
-  modeBtn: {
-    padding: "6px 12px", background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.4)",
-    border: "1px solid rgba(255,255,255,0.06)", borderRadius: "6px",
-    fontSize: "12px", cursor: "pointer",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  } as React.CSSProperties,
-
-  modeBtnActive: {
-    padding: "6px 12px", background: "rgba(212,160,48,0.08)", color: "#d4a030",
-    border: "1px solid rgba(212,160,48,0.3)", borderRadius: "6px",
-    fontSize: "12px", cursor: "pointer", fontWeight: 600,
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  } as React.CSSProperties,
-
-  statBox: {
-    background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)",
-    borderRadius: "6px", padding: "10px 12px", textAlign: "center",
-  } as React.CSSProperties,
-
-  statLabel: {
-    fontSize: "10px", color: "rgba(255,255,255,0.45)", marginBottom: "4px",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  } as React.CSSProperties,
-
-  statValue: {
-    fontSize: "22px", fontWeight: 700,
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  } as React.CSSProperties,
-
-  progressLabel: {
-    fontSize: "11px", color: "rgba(255,255,255,0.5)",
-  } as React.CSSProperties,
-
-  progressValue: {
-    fontSize: "11px", fontWeight: 600,
-  } as React.CSSProperties,
-
-  progressTrack: {
-    height: "3px", background: "rgba(255,255,255,0.06)", borderRadius: "2px", overflow: "hidden",
-  } as React.CSSProperties,
-
-  progressFill: {
-    height: "100%", borderRadius: "2px", transition: "width 0.6s ease",
-  } as React.CSSProperties,
-};
-
-const s2 = {
-  sectionHeader: {
-    padding: "14px 20px", fontSize: "13px", fontWeight: 600, color: "#fff",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
-  } as React.CSSProperties,
-
-  groupHeader: {
-    padding: "14px 20px 6px", fontSize: "11px", fontWeight: 600,
-    color: "rgba(255,255,255,0.5)", letterSpacing: "0.5px",
-  } as React.CSSProperties,
-
-  grid: {
-    padding: "0 20px 8px", display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "10px",
-  } as React.CSSProperties,
-
-  bigBox: {
-    background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: "8px", padding: "14px 12px", textAlign: "center",
-  } as React.CSSProperties,
-
-  bigLabel: {
-    fontSize: "10px", color: "rgba(255,255,255,0.45)", letterSpacing: "0.5px",
-    marginBottom: "6px",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  } as React.CSSProperties,
-
-  bigValue: {
-    fontSize: "26px", fontWeight: 700,
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  } as React.CSSProperties,
-
-  rankedHeader: {
-    padding: "16px 20px",
-    display: "flex", alignItems: "center", gap: "16px",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
-    background: "rgba(255,255,255,0.015)",
-  } as React.CSSProperties,
-
-  tierBadge: {
-    borderRadius: "10px",
-    padding: "10px 18px",
-    textAlign: "center",
-    minWidth: "64px",
-  } as React.CSSProperties,
-
   tierName: {
-    fontSize: "14px", fontWeight: 700, color: "#000",
-    lineHeight: "1.2",
+    fontSize: "16px", fontWeight: 700, color: "#fff",
+  } as React.CSSProperties,
+  tierRp: {
+    fontSize: "13px", color: "rgba(255,255,255,0.5)",
   } as React.CSSProperties,
 
-  tierSub: {
-    fontSize: "18px", fontWeight: 700, color: "#000",
-    lineHeight: "1.3",
+  // 数据区
+  gridPad: { padding: "12px 16px 16px" } as React.CSSProperties,
+  groupLabel: {
+    fontSize: "11px", fontWeight: 600, color: "rgba(255,255,255,0.4)",
+    letterSpacing: "0.5px", marginBottom: "6px",
   } as React.CSSProperties,
 
-  rankedStats: {
-    textAlign: "center",
-    flexShrink: 0,
+  // 小方格
+  statBox: {
+    background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.04)",
+    borderRadius: "6px", padding: "10px 8px", textAlign: "center",
   } as React.CSSProperties,
-
-  rpValue: {
-    fontSize: "22px", fontWeight: 700, color: "#d4a030",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  statValue: {
+    fontSize: "18px", fontWeight: 700, color: "#fff", marginBottom: "2px",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+    "--c": "#fff",
   } as React.CSSProperties,
-
-  rpLabel: {
+  statLabel: {
     fontSize: "10px", color: "rgba(255,255,255,0.4)",
   } as React.CSSProperties,
 
-  rankedQuick: {
-    display: "flex", gap: "16px",
+  // 空状态
+  empty: {
+    background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)",
+    borderRadius: "8px", padding: "32px 20px", textAlign: "center",
   } as React.CSSProperties,
+  emptyIcon: { fontSize: "24px", marginBottom: "8px" } as React.CSSProperties,
+  emptyText: { fontSize: "13px", color: "rgba(255,255,255,0.5)" } as React.CSSProperties,
+  emptySub: { fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" } as React.CSSProperties,
+};
 
-  quickItem: {
-    textAlign: "center",
+const st = {
+  statBox: {
+    background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.04)",
+    borderRadius: "6px", padding: "10px 8px", textAlign: "center",
   } as React.CSSProperties,
-
-  quickValue: {
-    fontSize: "16px", fontWeight: 600, color: "#fff",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  statValue: {
+    fontSize: "18px", fontWeight: 700, color: "#fff", marginBottom: "2px",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   } as React.CSSProperties,
-
-  quickLabel: {
-    fontSize: "9px", color: "rgba(255,255,255,0.4)", marginTop: "2px",
+  statLabel: {
+    fontSize: "10px", color: "rgba(255,255,255,0.4)",
   } as React.CSSProperties,
+  tierHero: {
+    display: "flex", alignItems: "center", gap: "12px",
+    padding: "0 16px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)",
+  } as React.CSSProperties,
+  tierImg: { width: "48px", height: "48px", borderRadius: "8px" } as React.CSSProperties,
+  tierInfo: { display: "flex", flexDirection: "column", gap: "2px" } as React.CSSProperties,
+  tierName: { fontSize: "16px", fontWeight: 700, color: "#fff" } as React.CSSProperties,
+  tierRp: { fontSize: "13px", color: "rgba(255,255,255,0.5)" } as React.CSSProperties,
 };
