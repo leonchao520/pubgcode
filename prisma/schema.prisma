@@ -24,7 +24,7 @@ model Player {
 
 model QueryLog {
   id        String   @id @default(cuid())
-  input     String   // 用户输入的原始字符串
+  input     String
   type      String   // "name" | "steamid"
   ip        String?
   success   Boolean
@@ -33,4 +33,12 @@ model QueryLog {
   @@index([createdAt(sort: Desc)], name: "idx_query_logs_created_at")
   @@index([success, createdAt(sort: Desc)], name: "idx_query_logs_success_time")
   @@map("query_logs")
+}
+
+model PlayerCache {
+  playerId  String   @id @map("player_id")
+  data      String   // JSON 大字段 (survival/weapon mastery等)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("player_cache")
 }

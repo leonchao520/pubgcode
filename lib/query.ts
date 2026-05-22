@@ -8,6 +8,7 @@ import {
   type WeaponMastery, type ClanInfo,
 } from "./pubg";
 import { fetchSteamPlayer, resolveSteamVanityUrl } from "./steam";
+import { getPlayerCache, setPlayerCache } from "./playerCache";
 
 export type QueryType = "name" | "steamid";
 
@@ -66,14 +67,20 @@ export async function queryPlayer(
         // 并行获取所有数据
         const clanPromise = pubgData.clanId ? fetchClan(pubgData.clanId).catch(() => null) : Promise.resolve(null);
         const bestRPPromise = fetchBestRankPoints(pubgData.id).catch(() => 0);
+
+        // Mastery 数据优先从 DB 缓存读取（绕过 PUBG API 限流）
+        const masteryCache = await getPlayerCache(pubgData.id).catch(() => null);
+        const cachedSurvival: any = masteryCache?.survivalMastery || null;
+        const cachedWeapons: any = masteryCache?.weaponMastery || null;
+
         const [seasons, normalStats, rankedStats, lifetimeStats, recentMatches, survivalMastery, weaponMastery, clan, bestRP] = await Promise.all([
           fetchSeasons().catch(() => [] as SeasonInfo[]),
           fetchNormalSeason(pubgData.id, sid),
           fetchRankedSeason(pubgData.id, sid).catch(() => null),
           fetchLifetimeStats(pubgData.id).catch(() => null),
           fetchRecentMatches(pubgData.id, 10).catch(() => [] as MatchSummary[]),
-          fetchSurvivalMastery(pubgData.id).catch(() => null),
-          fetchWeaponMastery(pubgData.id).catch(() => [] as WeaponMastery[]),
+          cachedSurvival ? Promise.resolve(cachedSurvival) : fetchSurvivalMastery(pubgData.id).catch(() => null),
+          cachedWeapons ? Promise.resolve(cachedWeapons) : fetchWeaponMastery(pubgData.id).catch(() => [] as WeaponMastery[]),
           clanPromise,
           bestRPPromise,
         ]);
@@ -83,10 +90,18 @@ export async function queryPlayer(
         result.rankedStats = rankedStats || undefined;
         result.lifetimeStats = lifetimeStats || undefined;
         result.recentMatches = recentMatches;
-        result.survivalMastery = survivalMastery || undefined;
-        result.weaponMastery = weaponMastery || undefined;
+        result.survivalMastery = survivalMastery || cachedSurvival || undefined;
+        result.weaponMastery = (weaponMastery?.length ? weaponMastery : cachedWeapons) || undefined;
         result.clan = clan || undefined;
         result.bestRankPoints = bestRP || undefined;
+
+        // 异步存回 DB 缓存（不阻塞返回）
+        if (!masteryCache && (survivalMastery || (weaponMastery && weaponMastery.length > 0))) {
+          setPlayerCache(pubgData.id, {
+            survivalMastery: survivalMastery || cachedSurvival,
+            weaponMastery: weaponMastery?.length ? weaponMastery : cachedWeapons,
+          }).catch(() => {});
+        }
 
         // 尝试获取 Steam 数据
         // 1) 优先 DB 中存储的 steamId
@@ -128,14 +143,17 @@ export async function queryPlayer(
           const sid = seasonId || await getCurrentSeasonId();
           const clanPromise2 = pubgData.clanId ? fetchClan(pubgData.clanId).catch(() => null) : Promise.resolve(null);
           const bestRPPromise2 = fetchBestRankPoints(pubgData.id).catch(() => 0);
+          const masteryCache2 = await getPlayerCache(pubgData.id).catch(() => null);
+          const cachedSurvival2 = (masteryCache2 as any)?.survivalMastery || null;
+          const cachedWeapons2 = (masteryCache2 as any)?.weaponMastery || null;
           const [seasons, normalStats, rankedStats, lifetimeStats, recentMatches, survivalMastery, weaponMastery, clan2, bestRP2] = await Promise.all([
             fetchSeasons().catch(() => [] as SeasonInfo[]),
             fetchNormalSeason(pubgData.id, sid),
             fetchRankedSeason(pubgData.id, sid).catch(() => null),
             fetchLifetimeStats(pubgData.id).catch(() => null),
             fetchRecentMatches(pubgData.id, 10).catch(() => [] as MatchSummary[]),
-            fetchSurvivalMastery(pubgData.id).catch(() => null),
-            fetchWeaponMastery(pubgData.id).catch(() => [] as WeaponMastery[]),
+            cachedSurvival2 ? Promise.resolve(cachedSurvival2) : fetchSurvivalMastery(pubgData.id).catch(() => null),
+            cachedWeapons2 ? Promise.resolve(cachedWeapons2) : fetchWeaponMastery(pubgData.id).catch(() => [] as WeaponMastery[]),
             clanPromise2,
             bestRPPromise2,
           ]);
@@ -144,8 +162,8 @@ export async function queryPlayer(
           result.rankedStats = rankedStats || undefined;
           result.lifetimeStats = lifetimeStats || undefined;
           result.recentMatches = recentMatches;
-          result.survivalMastery = survivalMastery || undefined;
-          result.weaponMastery = weaponMastery || undefined;
+          result.survivalMastery = survivalMastery || cachedSurvival2 || undefined;
+          result.weaponMastery = (weaponMastery?.length ? weaponMastery : cachedWeapons2) || undefined;
           result.clan = clan2 || undefined;
           result.bestRankPoints = bestRP2 || undefined;
           
