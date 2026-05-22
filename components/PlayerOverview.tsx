@@ -9,6 +9,8 @@ import { signParams } from "@/lib/sign-client";
 import StatsPanel from "./StatsPanel";
 import MatchHistory from "./MatchHistory";
 import MatchDetailModal from "./MatchDetailModal";
+import StatsTab from "./StatsTab";
+import MasteryTab from "./MasteryTab";
 import type { MatchSummary } from "@/lib/pubg";
 
 /* ═══════════════════════════════════════════
@@ -412,6 +414,20 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
                 onSeasonChange={handleSeasonChange}
               />
             )}
+          </div>
+        )}
+
+        {/* ─── 统计 Tab ──────────── */}
+        {result && !loading && pubg && activeTab === "stats" && (
+          <div style={st.content}>
+            <StatsTab result={result} />
+          </div>
+        )}
+
+        {/* ─── 精通 Tab ──────────── */}
+        {result && !loading && pubg && activeTab === "mastery" && (
+          <div style={st.content}>
+            <MasteryTab result={result} />
           </div>
         )}
 
