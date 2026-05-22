@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { QueryResult } from "@/lib/query";
 import { getSurvivalLevel, getTierColor, getTierLabel, getSubTierLabel, getTierImage } from "./PlayerHelpers";
+import StatsPanel from "./StatsPanel";
 
 /* ═══════════════════════════════════════════
    玩家战绩总览页 — /player/[name]
@@ -31,6 +32,9 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<string>("overview");
+  const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(undefined);
+  const [seasonResult, setSeasonResult] = useState<QueryResult | null>(null);
+  const [seasonLoading, setSeasonLoading] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favHydrated, setFavHydrated] = useState(false);
 
@@ -74,6 +78,26 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
       .catch(() => setError("网络错误"))
       .finally(() => setLoading(false));
   }
+
+  function handleSeasonChange(seasonId: string) {
+    const q = input.trim();
+    if (!q) return;
+    setSelectedSeasonId(seasonId || undefined);
+    setSeasonLoading(true);
+    const params = new URLSearchParams({ q });
+    if (seasonId) params.set("season", seasonId);
+    fetch(`/api/query?${params.toString()}`)
+      .then(r => r.json())
+      .then(data => { setSeasonResult(data); setSeasonLoading(false); })
+      .catch(() => setSeasonLoading(false));
+  }
+
+  // 合并赛季数据
+  const seasonDisplayResult = selectedSeasonId ? ({
+    ...result,
+    normalStats: seasonResult?.normalStats,
+    rankedStats: seasonResult?.rankedStats,
+  }) : result;
 
   // 段位数据
   const rankedModeEntry = rankedStats ? Object.entries(rankedStats.stats)[0] : null;
@@ -359,6 +383,22 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
             <div style={st.footer}>
               <span>ℹ️</span> 封禁状态及公会信息存在数小时延迟。
             </div>
+          </div>
+        )}
+
+        {/* ─── 赛季 Tab ──────────── */}
+        {result && !loading && pubg && activeTab === "season" && (
+          <div style={st.content}>
+            {seasonLoading ? (
+              <div style={st.loadingCard}>
+                <p style={st.loadingText}>加载赛季数据中...</p>
+              </div>
+            ) : (
+              <StatsPanel
+                result={seasonDisplayResult as QueryResult}
+                onSeasonChange={handleSeasonChange}
+              />
+            )}
           </div>
         )}
 
