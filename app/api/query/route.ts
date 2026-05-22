@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getRatelimit } from "@/lib/redis";
 import { queryPlayer } from "@/lib/query";
 import { prisma } from "@/lib/db";
+import { verifySign } from "@/lib/sign";
 
 export const runtime = "nodejs";
 
@@ -34,6 +35,13 @@ export async function GET(req: NextRequest) {
       { error: "请输入有效的玩家昵称（2-50 个字符）或 Steam ID" },
       { status: 400 }
     );
+  }
+
+  // 签名校验 — 防爬
+  const ts = req.nextUrl.searchParams.get("ts") || "";
+  const sign = req.nextUrl.searchParams.get("sign") || "";
+  if (!verifySign(ts, sign)) {
+    return NextResponse.json({ error: "签名校验失败" }, { status: 403 });
   }
 
   // Rate limiting — 基于真实 IP

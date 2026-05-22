@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, CSSProperties, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { QueryResult } from "@/lib/query";
+import { signParams } from "@/lib/sign-client";
 import OverviewTab from "@/components/OverviewTab";
 import StatsPanel from "@/components/StatsPanel";
 import MatchHistory from "@/components/MatchHistory";
@@ -13,7 +14,6 @@ import type { MatchSummary } from "@/lib/pubg";
 import { addQuery, getLocalQueries } from "@/lib/localHistory";
 
 const EXAMPLES = ["shroud", "WackyJacky101", "76561198000000000"];
-const API = process.env.NEXT_PUBLIC_API_URL || "";
 type Tab = "overview" | "stats" | "matches";
 
 /** 获取最近本地查询作为示例 */
@@ -75,7 +75,8 @@ export default function HomePage() {
     try {
       const params = new URLSearchParams({ q });
       if (season) params.set("season", season);
-      const url = `${API}/api/query?${params.toString()}`;
+      const sp = await signParams();
+      const url = `/api/query?${params.toString()}&${sp}`;
       const res = await fetch(url);
       const data = await res.json();
 

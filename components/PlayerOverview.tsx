@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { QueryResult } from "@/lib/query";
 import type { GameModeStats } from "@/lib/pubg";
 import { getSurvivalLevel, getTierLabel, getSubTierLabel, getTierImage } from "./PlayerHelpers";
+import { signParams } from "@/lib/sign-client";
 import StatsPanel from "./StatsPanel";
 
 /* ═══════════════════════════════════════════
@@ -72,14 +73,16 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
     setSelectedSeasonId(undefined);
     setSeasonResult(null);
     router.push(`/player/${encodeURIComponent(q)}`);
-    fetch(`/api/query?q=${encodeURIComponent(q)}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.error) { setError(data.error); setResult(null); }
-        else { setResult(data); setError(""); }
-      })
-      .catch(() => setError("网络错误"))
-      .finally(() => setLoading(false));
+    signParams().then(sp =>
+      fetch(`/api/query?q=${encodeURIComponent(q)}&${sp}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) { setError(data.error); setResult(null); }
+          else { setResult(data); setError(""); }
+        })
+        .catch(() => setError("网络错误"))
+        .finally(() => setLoading(false))
+    );
   }
 
   function handleSeasonChange(seasonId: string) {
@@ -89,10 +92,12 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
     setSeasonLoading(true);
     const params = new URLSearchParams({ q });
     if (seasonId) params.set("season", seasonId);
-    fetch(`/api/query?${params.toString()}`)
-      .then(r => r.json())
-      .then(data => { setSeasonResult(data); setSeasonLoading(false); })
-      .catch(() => setSeasonLoading(false));
+    signParams().then(sp =>
+      fetch(`/api/query?${params.toString()}&${sp}`)
+        .then(r => r.json())
+        .then(data => { setSeasonResult(data); setSeasonLoading(false); })
+        .catch(() => setSeasonLoading(false))
+    );
   }
 
   // 合并赛季数据
