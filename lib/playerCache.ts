@@ -3,8 +3,6 @@
 import { prisma } from "./db";
 import { getCached, setCached } from "./redis";
 
-const MASTERY_CACHE_TTL = 86400; // 24 小时
-
 /** 缓存 survivalMastery */
 export async function getCachedSurvivalMastery(playerId: string) {
   const key = `m:survival:${playerId}`;
@@ -44,7 +42,7 @@ export async function getPlayerCache(playerId: string): Promise<Record<string, a
     if (record?.data) {
       const data = JSON.parse(record.data);
       // 写回 Redis
-      await setCached(key, record.data, 86400);
+      await setCached(key, record.data);
       return data;
     }
     return null;
