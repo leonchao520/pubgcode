@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  # ─── Next.js 应用 ───────────────────────
+  app:
+    build:
+      context: .
+      args:
+        - STEAM_API_KEY=${STEAM_API_KEY}
+        - PUBG_API_KEY=${PUBG_API_KEY}
+    ports:
+      - "3000:3000"
+    environment:
+      # PUBG API
+      - PUBG_API_KEY=${PUBG_API_KEY}
+      # Steam API
+      - STEAM_API_KEY=${STEAM_API_KEY}
+      # PostgreSQL（指向 db 容器）
+      - POSTGRES_PRISMA_URL=postgresql://pubgquery:pubgquery123@db:5432/pubgquery
+      - POSTGRES_URL_NON_POOLING=postgresql://pubgquery:pubgquery123@db:5432/pubgquery
+      # Redis（指向 redis 容器，使用自托管 ioredis 模式）
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  # ─── PostgreSQL ─────────────────────────
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: pubgquery
+      POSTGRES_PASSWORD: pubgquery123
+      POSTGRES_DB: pubgquery
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pubgquery"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ─── Redis（替代 Upstash）───────────────
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:

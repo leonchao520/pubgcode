@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Player {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  nameLower String   @unique @map("name_lower")
+  steamId   String?  @map("steam_id")
+  favorite  Boolean  @default(false)
+  queriedAt DateTime @default(now()) @map("queried_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([steamId], name: "idx_players_steam_id")
+  @@index([favorite, queriedAt(sort: Desc)], name: "idx_players_fav_time")
+  @@map("players")
+}
+
+model QueryLog {
+  id        String   @id @default(cuid())
+  input     String   // 用户输入的原始字符串
+  type      String   // "name" | "steamid"
+  ip        String?
+  success   Boolean
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt(sort: Desc)], name: "idx_query_logs_created_at")
+  @@index([success, createdAt(sort: Desc)], name: "idx_query_logs_success_time")
+  @@map("query_logs")
+}
