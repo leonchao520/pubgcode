@@ -35,7 +35,7 @@ function WeaponDetailModal({ weapon, onClose }: { weapon: WeaponMastery; onClose
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={md.icon}>
               <img
-                src={`https://pubg-static.akamaized.net/gameassets/Weapons/${weapon.weaponId}.png`}
+                src={`/assets/weapons/${weapon.weaponId}.png`}
                 alt=""
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
                 onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -141,7 +141,17 @@ export default function MasteryTab({ result }: { result: QueryResult }) {
                   onClick={() => setSelectedWeapon(w)}
                 >
                   <div style={ms.weaponIcon}>
-                    <span style={{ fontSize: "24px" }}>{emoji}</span>
+                    <img
+                      src={`/assets/weapons/${w.weaponId}.png`}
+                      alt={name}
+                      style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                      onError={e => {
+                        const t = e.target as HTMLImageElement;
+                        t.style.display = "none";
+                        t.parentElement!.innerHTML = `<span style="font-size:24px">${emoji}</span>`;
+                      }}
+                    />
+                    <span style={{ fontSize: "24px", display: "none" }} className="weapon-emoji-fallback">{emoji}</span>
                   </div>
                   <div style={ms.weaponInfo}>
                     <div style={ms.weaponName}>{name}</div>

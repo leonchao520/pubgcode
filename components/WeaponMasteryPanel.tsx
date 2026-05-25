@@ -22,7 +22,6 @@ export default function WeaponMasteryPanel({ weapons }: { weapons: WeaponMastery
         const name = getWeaponName(w.weaponId);
         const tierLabel = getMasteryTierLabel(w.tier);
         const killPct = Math.round((w.kills / maxKill) * 100);
-        const imgUrl = `https://pubg-static.akamaized.net/gameassets/Weapons/Item_Weapon_${w.weaponId.toLowerCase().replace("weapon_","").replace("_c","")}.png`;
 
         return (
           <div key={w.weaponId} style={s.weaponRow}>
@@ -34,7 +33,7 @@ export default function WeaponMasteryPanel({ weapons }: { weapons: WeaponMastery
             {/* 图标 */}
             <div style={s.weaponIcon}>
               <img
-                src={imgUrl}
+                src={`/assets/weapons/${w.weaponId}.png`}
                 alt={name}
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
                 onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
