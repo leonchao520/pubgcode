@@ -171,10 +171,12 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
       <div style={st.container}>
         {/* ─── 搜索栏 ──────────────── */}
         <div style={st.searchWrap}>
-          <a href="/" style={st.backLink} title="返回首页">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
+          <a href="/" style={st.logoLink} title="PUBG.BAR 首页">
+            <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+              <path d="M10 1L1 6v8l9 5 9-5V6L10 1z" stroke="#E6B849" strokeWidth="1.5" fill="none"/>
+              <circle cx="10" cy="10" r="3" stroke="#E6B849" strokeWidth="1.5" fill="none"/>
             </svg>
+            <span style={st.logoText}>PUBG<span style={{color:"#E6B849"}}>.</span>BAR</span>
           </a>
           <div style={st.searchBox}>
             <svg style={st.searchIcon} width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -534,6 +536,14 @@ const st: Record<string, React.CSSProperties> = {
     display: "flex", alignItems: "center", gap: "10px",
     marginBottom: "8px",
   },
+  logoLink: {
+    display: "flex", alignItems: "center", gap: "8px",
+    color: "#fff", textDecoration: "none", flexShrink: 0,
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  } as React.CSSProperties,
+  logoText: {
+    fontSize: "16px", fontWeight: 700, letterSpacing: "-0.3px",
+  } as React.CSSProperties,
   backLink: {
     color: "rgba(255,255,255,0.4)", display: "flex", alignItems: "center",
     textDecoration: "none", flexShrink: 0,

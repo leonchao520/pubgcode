@@ -363,7 +363,7 @@ export default function HomePage() {
 
 const lg = {
   page: (hasResult: boolean): CSSProperties => ({
-    backgroundColor: "#000", color: "#fff", minHeight: "100vh",
+    backgroundColor: "#121212", color: "#fff", minHeight: "100vh",
     display: "flex", flexDirection: "column", alignItems: "center",
     padding: "20px",
     justifyContent: hasResult ? "flex-start" : "center",
@@ -381,11 +381,11 @@ const lg = {
 
   // 导航栏
   navBar: { display: "flex", gap: "6px", justifyContent: "center", marginBottom: "20px", flexWrap: "wrap", maxWidth: "560px", width: "100%", marginLeft: "auto", marginRight: "auto" } as CSSProperties,
-  navItem: { padding: "8px 20px", borderRadius: "8px", fontSize: "13px", fontWeight: 500, color: "rgba(255,255,255,0.5)", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", textDecoration: "none", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", transition: "0.15s ease", whiteSpace: "nowrap" } as CSSProperties,
+  navItem: { padding: "8px 20px", borderRadius: "8px", fontSize: "13px", fontWeight: 500, color: "#A3A3A3", background: "transparent", border: "1px solid #333333", textDecoration: "none", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", transition: "0.15s ease", whiteSpace: "nowrap" } as CSSProperties,
   navItemActive: { padding: "8px 20px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, color: "#E6B849", background: "rgba(230,184,73,0.1)", border: "1px solid rgba(230,184,73,0.25)", textDecoration: "none", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", whiteSpace: "nowrap" } as CSSProperties,
   searchWrapper: { position: "relative", width: "100%", maxWidth: "560px", marginBottom: "12px" } as CSSProperties,
   searchIcon: { position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#a3a3a3", pointerEvents: "none", zIndex: 1 } as CSSProperties,
-  input: { width: "100%", padding: "16px 150px 16px 44px", backgroundColor: "#171717", color: "#fff", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "12px", fontSize: "15px", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", outline: "none", transition: "0.2s ease", boxSizing: "border-box" } as CSSProperties,
+  input: { width: "100%", padding: "16px 150px 16px 44px", backgroundColor: "#1E1E1E", color: "#fff", border: "1px solid #333333", borderRadius: "12px", fontSize: "15px", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", outline: "none", transition: "0.2s ease", boxSizing: "border-box" } as CSSProperties,
   inputPC: { maxWidth: "560px" } as CSSProperties,
   clearBtn: { position: "absolute", right: "118px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "rgba(255,255,255,0.45)", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center", zIndex: 1 } as CSSProperties,
   historyBtn: { position: "absolute", right: "80px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center", zIndex: 1, textDecoration: "none" } as CSSProperties,
@@ -404,20 +404,20 @@ const lg = {
   error: { color: "#ef4444", fontSize: "12px", marginTop: "6px", textAlign: "center", width: "100%" } as CSSProperties,
   examples: { display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginTop: "20px" } as CSSProperties,
   examplesLabel: { fontSize: "12px", color: "rgba(255,255,255,0.4)", lineHeight: "28px" },
-  exampleBtn: { background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "4px", padding: "4px 12px", fontSize: "12px", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", cursor: "pointer", transition: "0.15s ease" },
+  exampleBtn: { background: "rgba(255,255,255,0.04)", color: "#A3A3A3", border: "1px solid #333333", borderRadius: "4px", padding: "4px 12px", fontSize: "12px", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", cursor: "pointer", transition: "0.15s ease" },
 
-  tabBar: { display: "flex", gap: "4px", padding: "4px", background: "#0d0d0d", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.06)" } as CSSProperties,
+  tabBar: { display: "flex", gap: "4px", padding: "4px", background: "#1E1E1E", borderRadius: "10px", border: "1px solid #333333" } as CSSProperties,
   tab: { flex: 1, padding: "10px", background: "transparent", color: "rgba(255,255,255,0.5)", border: "none", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 500, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", transition: "0.15s ease", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" } as CSSProperties,
   tabActive: { flex: 1, padding: "10px", background: "rgba(230,184,73,0.15)", color: "#E6B849", border: "none", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 600, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" } as CSSProperties,
   tabBadge: { background: "rgba(230,184,73,0.25)", color: "#E6B849", fontSize: "10px", padding: "1px 6px", borderRadius: "8px", fontWeight: 600 } as CSSProperties,
-  emptyCard: { background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "32px 20px", textAlign: "center" } as CSSProperties,
+  emptyCard: { background: "#1E1E1E", border: "1px solid #333333", borderRadius: "8px", padding: "32px 20px", textAlign: "center" } as CSSProperties,
   bottomBar: { display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "4px" } as CSSProperties,
   cacheInfo: { fontSize: "11px", color: "rgba(255,255,255,0.45)" },
   bottomLink: { fontSize: "11px", color: "rgba(255,255,255,0.45)", textDecoration: "none" },
   serverBar: {
     display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
     padding: "10px 0 4px", marginTop: "8px",
-    borderTop: "1px solid rgba(255,255,255,0.05)",
+    borderTop: "1px solid #333333",
     maxWidth: "560px", width: "100%", marginLeft: "auto", marginRight: "auto",
   } as CSSProperties,
   serverLabel: { fontSize: "11px", color: "rgba(255,255,255,0.35)" },
@@ -428,11 +428,11 @@ const lg = {
   serverDivider: { fontSize: "10px", color: "rgba(255,255,255,0.15)" },
 
   // 功能说明
-  faqSection: { maxWidth: "560px", width: "100%", marginLeft: "auto", marginRight: "auto", marginTop: "32px", padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)" } as CSSProperties,
-  faqTitle: { fontSize: "14px", fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: "16px", textAlign: "center" } as CSSProperties,
+  faqSection: { maxWidth: "560px", width: "100%", marginLeft: "auto", marginRight: "auto", marginTop: "32px", padding: "20px", background: "#1E1E1E", borderRadius: "12px", border: "1px solid #333333" } as CSSProperties,
+  faqTitle: { fontSize: "14px", fontWeight: 600, color: "#A3A3A3", marginBottom: "16px", textAlign: "center" } as CSSProperties,
   faqGrid: { display: "flex", gap: "12px", flexWrap: "wrap" } as CSSProperties,
-  faqCard: { flex: "1 1 240px", padding: "16px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)" } as CSSProperties,
+  faqCard: { flex: "1 1 240px", padding: "16px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid #333333" } as CSSProperties,
   faqCardIcon: { marginBottom: "10px" },
-  faqCardTitle: { fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.85)", marginBottom: "8px" },
-  faqCardText: { fontSize: "12px", color: "rgba(255,255,255,0.45)", lineHeight: "1.6" },
+  faqCardTitle: { fontSize: "13px", fontWeight: 600, color: "#fff", marginBottom: "8px" },
+  faqCardText: { fontSize: "12px", color: "#A3A3A3", lineHeight: "1.6" },
 };
