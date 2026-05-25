@@ -590,7 +590,7 @@ export async function fetchLeaderboard(
   const included = json.included || [];
   const players: LeaderboardPlayer[] = included
     .filter((item: any) => item.type === "player")
-    .map((item: any, i: number) => {
+    .map((item: any) => {
       const attrs = item.attributes || {};
       const stats = attrs.stats || {};
       const games = stats.games || 1;
@@ -599,7 +599,7 @@ export async function fetchLeaderboard(
       return {
         accountId: item.id || "",
         name: attrs.name || "?",
-        rank: i + 1,
+        rank: stats.rank || 0,  // PUBG API 返回的真实排名
         rankPoints: stats.rankPoints || 0,
         tier: stats.tier || "?",
         subTier: stats.subTier || "",
@@ -612,7 +612,9 @@ export async function fetchLeaderboard(
         averageRank: stats.averageRank || 0,
         top10Ratio: games > 0 ? Math.round(((stats.top10s || 0) / games) * 1000) / 10 : 0,
       };
-    });
+    })
+    // 按排名升序（#1 在前）
+    .sort((a, b) => a.rank - b.rank);
 
   return {
     shardId: data.attributes?.shardId || shard,

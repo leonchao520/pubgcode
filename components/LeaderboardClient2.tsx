@@ -59,23 +59,23 @@ const MODE_GROUPS: { label: string; modes: Mode[] }[] = [
 ];
 
 const s: Record<string, React.CSSProperties> = {
-  page: { backgroundColor: "#000", color: "#fff", minHeight: "100vh", padding: "20px 12px 60px" },
+  page: { backgroundColor: "#121212", color: "#fff", minHeight: "100vh", padding: "20px 12px 60px" },
   container: { width: "100%", maxWidth: "960px", margin: "0 auto" },
   header: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", marginBottom: "20px" },
   title: { fontSize: "22px", fontWeight: 700, letterSpacing: "-0.5px" },
   back: { color: "#E6B849", textDecoration: "none", fontSize: "14px", fontWeight: 500 },
   shardRow: { display: "flex", gap: "6px", marginBottom: "16px", flexWrap: "wrap" },
   modeRow: { display: "flex", gap: "8px", marginBottom: "20px", alignItems: "center", flexWrap: "wrap" },
-  modeGroupLabel: { fontSize: "12px", color: "rgba(255,255,255,0.35)", minWidth: "32px" },
+  modeGroupLabel: { fontSize: "12px", color: "#A3A3A3", minWidth: "32px" },
   tableWrapper: { width: "100%", overflowX: "auto" as const, WebkitOverflowScrolling: "touch" as any },
   table: { width: "100%", borderCollapse: "collapse" as const, fontSize: "14px", minWidth: "680px" },
-  th: { textAlign: "left" as const, padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)", fontSize: "12px", fontWeight: 500, whiteSpace: "nowrap" as const },
-  thRight: { textAlign: "right" as const, padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)", fontSize: "12px", fontWeight: 500, whiteSpace: "nowrap" as const },
+  th: { textAlign: "left" as const, padding: "10px 12px", borderBottom: "1px solid #333333", color: "#A3A3A3", fontSize: "12px", fontWeight: 500, whiteSpace: "nowrap" as const },
+  thRight: { textAlign: "right" as const, padding: "10px 12px", borderBottom: "1px solid #333333", color: "#A3A3A3", fontSize: "12px", fontWeight: 500, whiteSpace: "nowrap" as const },
   td: { padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)" },
   tdRight: { padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)", textAlign: "right" as const },
   playerName: { color: "#fff", fontWeight: 500, maxWidth: "140px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, display: "inline-block" },
   tierText: { fontSize: "13px", fontWeight: 600, verticalAlign: "middle" },
-  meta: { fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "16px", textAlign: "center" as const },
+  meta: { fontSize: "11px", color: "#A3A3A3", marginTop: "16px", textAlign: "center" as const },
 };
 
 export default function LeaderboardPage() {
@@ -107,7 +107,7 @@ export default function LeaderboardPage() {
         <div style={s.header}>
           <div>
             <h1 style={s.title}>🏆 排行榜</h1>
-            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.35)", marginTop: "4px" }}>
+            <p style={{ fontSize: "13px", color: "#A3A3A3", marginTop: "4px" }}>
               竞技模式前 500 名
             </p>
           </div>
@@ -126,9 +126,9 @@ export default function LeaderboardPage() {
             return (
             <button key={id} onClick={() => setShard(id)} style={{
               padding: "8px 16px", borderRadius: "8px",
-              border: `1px solid ${active ? "#E6B849" : "rgba(255,255,255,0.1)"}`,
-              background: active ? "rgba(230,184,73,0.12)" : "#111",
-              color: active ? "#E6B849" : "rgba(255,255,255,0.6)",
+              border: `1px solid ${active ? "#E6B849" : "#333333"}`,
+              background: active ? "rgba(230,184,73,0.12)" : "#1E1E1E",
+              color: active ? "#E6B849" : "#A3A3A3",
               fontSize: "13px", fontWeight: 500, cursor: "pointer", transition: "0.15s",
             }}>
               {label}
@@ -146,9 +146,9 @@ export default function LeaderboardPage() {
                 return (
               <button key={m} onClick={() => setMode(m)} style={{
                 padding: "6px 14px", borderRadius: "6px",
-                border: `1px solid ${active ? "#E6B849" : "rgba(255,255,255,0.08)"}`,
+                border: `1px solid ${active ? "#E6B849" : "#333333"}`,
                 background: active ? "rgba(230,184,73,0.12)" : "transparent",
-                color: active ? "#E6B849" : "rgba(255,255,255,0.5)",
+                color: active ? "#E6B849" : "#A3A3A3",
                 fontSize: "12px", fontWeight: 600, cursor: "pointer", transition: "0.15s",
               }}>
                 {m.endsWith("-fpp") ? "FPP" : "TPP"}
@@ -207,9 +207,9 @@ export default function LeaderboardPage() {
                       </span>
                     </td>
                     <td style={{ ...s.tdRight }}><span style={{ fontWeight: 600, color: "#E6B849" }}>{p.rankPoints.toLocaleString()}</span></td>
-                    <td style={{ ...s.tdRight, color: "rgba(255,255,255,0.7)" }}>{p.winRatio}%</td>
-                    <td style={{ ...s.tdRight, color: "rgba(255,255,255,0.7)" }}>{p.kda}</td>
-                    <td style={{ ...s.tdRight, color: "rgba(255,255,255,0.7)" }}>{Math.round(p.averageDamage)}</td>
+                    <td style={{ ...s.tdRight, color: "#A3A3A3" }}>{p.winRatio}%</td>
+                    <td style={{ ...s.tdRight, color: "#A3A3A3" }}>{p.kda}</td>
+                    <td style={{ ...s.tdRight, color: "#A3A3A3" }}>{Math.round(p.averageDamage)}</td>
                     <td style={{ ...s.tdRight }} className="hide-mobile">{p.top10Ratio}%</td>
                   </tr>
                 ))}
