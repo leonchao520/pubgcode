@@ -170,12 +170,12 @@ export default function HomePage() {
         <div style={lg.logoArea(hasResult)}>
           <div style={lg.logoIcon}>
             <svg width="24" height="24" viewBox="0 0 20 20" fill="none">
-              <path d="M10 1L1 6v8l9 5 9-5V6L10 1z" stroke="#D4A030" strokeWidth="1.5" fill="none"/>
-              <circle cx="10" cy="10" r="3" stroke="#D4A030" strokeWidth="1.5" fill="none"/>
+              <path d="M10 1L1 6v8l9 5 9-5V6L10 1z" stroke="#E6B849" strokeWidth="1.5" fill="none"/>
+              <circle cx="10" cy="10" r="3" stroke="#E6B849" strokeWidth="1.5" fill="none"/>
             </svg>
           </div>
           <h1 style={lg.title}>
-            PUBG<span style={{ color: "#D4A030" }}>.</span>BAR
+            PUBG<span style={{ color: "#E6B849" }}>.</span>BAR
           </h1>
           <p style={lg.subtitle}>玩家状态查询 / 战绩追踪 / 封禁检测</p>
 
@@ -327,7 +327,7 @@ export default function HomePage() {
             <div style={lg.faqGrid} className="faq-grid-mobile">
               <div style={lg.faqCard}>
                 <div style={lg.faqCardIcon}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4A030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E6B849" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                     <circle cx="12" cy="7" r="4"/>
                   </svg>
@@ -337,7 +337,7 @@ export default function HomePage() {
               </div>
               <div style={lg.faqCard}>
                 <div style={lg.faqCardIcon}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4A030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E6B849" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="12" y1="8" x2="12" y2="12"/>
                     <line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -382,7 +382,7 @@ const lg = {
   // 导航栏
   navBar: { display: "flex", gap: "6px", justifyContent: "center", marginBottom: "20px", flexWrap: "wrap", maxWidth: "560px", width: "100%", marginLeft: "auto", marginRight: "auto" } as CSSProperties,
   navItem: { padding: "8px 20px", borderRadius: "8px", fontSize: "13px", fontWeight: 500, color: "rgba(255,255,255,0.5)", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", textDecoration: "none", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", transition: "0.15s ease", whiteSpace: "nowrap" } as CSSProperties,
-  navItemActive: { padding: "8px 20px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, color: "#D4A030", background: "rgba(212,160,48,0.1)", border: "1px solid rgba(212,160,48,0.25)", textDecoration: "none", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", whiteSpace: "nowrap" } as CSSProperties,
+  navItemActive: { padding: "8px 20px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, color: "#E6B849", background: "rgba(230,184,73,0.1)", border: "1px solid rgba(230,184,73,0.25)", textDecoration: "none", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", whiteSpace: "nowrap" } as CSSProperties,
   searchWrapper: { position: "relative", width: "100%", maxWidth: "560px", marginBottom: "12px" } as CSSProperties,
   searchIcon: { position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#a3a3a3", pointerEvents: "none", zIndex: 1 } as CSSProperties,
   input: { width: "100%", padding: "16px 150px 16px 44px", backgroundColor: "#171717", color: "#fff", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "12px", fontSize: "15px", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", outline: "none", transition: "0.2s ease", boxSizing: "border-box" } as CSSProperties,
@@ -392,9 +392,9 @@ const lg = {
   submitBtn: (inputVal: string, loading: boolean): CSSProperties => ({
     position: "absolute", right: "6px", top: "50%", transform: "translateY(-50%)",
     padding: "10px 22px",
-    background: inputVal.trim() ? "#D4A030" : "transparent",
-    color: inputVal.trim() ? "#000" : "rgba(212,160,48,0.6)",
-    border: inputVal.trim() ? "none" : "1px solid rgba(212,160,48,0.4)",
+    background: inputVal.trim() ? "#E6B849" : "transparent",
+    color: inputVal.trim() ? "#000" : "rgba(230,184,73,0.6)",
+    border: inputVal.trim() ? "none" : "1px solid rgba(230,184,73,0.4)",
     borderRadius: "8px", fontSize: "14px", fontWeight: 600,
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     cursor: inputVal.trim() && !loading ? "pointer" : loading ? "wait" : "default",
@@ -408,8 +408,8 @@ const lg = {
 
   tabBar: { display: "flex", gap: "4px", padding: "4px", background: "#0d0d0d", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.06)" } as CSSProperties,
   tab: { flex: 1, padding: "10px", background: "transparent", color: "rgba(255,255,255,0.5)", border: "none", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 500, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", transition: "0.15s ease", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" } as CSSProperties,
-  tabActive: { flex: 1, padding: "10px", background: "rgba(212,160,48,0.15)", color: "#D4A030", border: "none", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 600, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" } as CSSProperties,
-  tabBadge: { background: "rgba(212,160,48,0.25)", color: "#D4A030", fontSize: "10px", padding: "1px 6px", borderRadius: "8px", fontWeight: 600 } as CSSProperties,
+  tabActive: { flex: 1, padding: "10px", background: "rgba(230,184,73,0.15)", color: "#E6B849", border: "none", borderRadius: "8px", fontSize: "13px", cursor: "pointer", fontWeight: 600, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" } as CSSProperties,
+  tabBadge: { background: "rgba(230,184,73,0.25)", color: "#E6B849", fontSize: "10px", padding: "1px 6px", borderRadius: "8px", fontWeight: 600 } as CSSProperties,
   emptyCard: { background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "32px 20px", textAlign: "center" } as CSSProperties,
   bottomBar: { display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "4px" } as CSSProperties,
   cacheInfo: { fontSize: "11px", color: "rgba(255,255,255,0.45)" },

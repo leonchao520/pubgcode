@@ -212,7 +212,7 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
         {error && <p style={st.error}>{error}</p>}
         {loading && (
           <div style={st.loadingCard}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D4A030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin" style={{margin: "0 auto 12px", display: "block"}}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#E6B849" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin" style={{margin: "0 auto 12px", display: "block"}}>
               <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
             </svg>
             <p style={st.loadingText}>查询中...</p>
@@ -263,7 +263,7 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
                       {favHydrated && (
                         <button onClick={toggleFav} style={st.favBtn} title={isFav ? "取消收藏" : "收藏"}>
                           {isFav ? (
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#D4A030" stroke="#D4A030" strokeWidth="1.5">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#E6B849" stroke="#E6B849" strokeWidth="1.5">
                               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                             </svg>
                           ) : (
@@ -320,7 +320,7 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
                 <KpiBox
                   label="总场次"
                   value={totalMatches > 0 ? totalMatches.toLocaleString() : "?"}
-                  color="#D4A030"
+                  color="#E6B849"
                 />
                 <KpiBox
                   label="满级进度"
@@ -474,9 +474,9 @@ function StatusBadge({ banType }: { banType: string }) {
       borderRadius: "6px",
       fontSize: "13px",
       fontWeight: 700,
-      background: clean ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
-      color: clean ? "#4ADE80" : "#F87171",
-      border: `1px solid ${clean ? "rgba(34,197,94,0.25)" : "rgba(239,68,68,0.25)"}`,
+      background: clean ? "rgba(34,167,93,0.12)" : "rgba(239,68,68,0.12)",
+      color: clean ? "#22A75D" : "#F87171",
+      border: `1px solid ${clean ? "rgba(34,167,93,0.25)" : "rgba(239,68,68,0.25)"}`,
     }}>
       {clean ? "正常" : banType}
     </span>
@@ -499,7 +499,7 @@ function searchBtnStyle(hasVal: string, loading: boolean): React.CSSProperties {
   return {
     position: "absolute", right: "4px", top: "50%", transform: "translateY(-50%)",
     padding: "8px 20px",
-    background: active ? "#D4A030" : "transparent",
+    background: active ? "#E6B849" : "transparent",
     color: active ? "#000" : "rgba(255,255,255,0.4)",
     border: active ? "none" : "1px solid rgba(255,255,255,0.15)",
     borderRadius: "8px", fontSize: "13px", fontWeight: 600,
@@ -548,7 +548,7 @@ const st: Record<string, React.CSSProperties> = {
   },
   searchInput: {
     width: "100%", padding: "14px 110px 14px 42px",
-    backgroundColor: "#1a1a1a", color: "#fff",
+    backgroundColor: "#1E1E1E", color: "#fff",
     border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px",
     fontSize: "15px", outline: "none", boxSizing: "border-box",
   },
@@ -556,20 +556,19 @@ const st: Record<string, React.CSSProperties> = {
   // Tab
   tabBar: {
     display: "flex", gap: "0",
-    background: "#1a1a1a", borderRadius: "8px",
-    overflow: "hidden", border: "1px solid rgba(255,255,255,0.06)",
+    borderBottom: "1px solid #333333",
   },
   tab: {
-    flex: 1, padding: "12px", textAlign: "center",
-    background: "transparent", color: "rgba(255,255,255,0.5)",
-    border: "none", borderBottom: "2px solid transparent",
+    padding: "14px 32px",
+    background: "transparent", color: "#A3A3A3",
+    border: "none", borderBottom: "3px solid transparent",
     fontSize: "13px", fontWeight: 500, cursor: "pointer",
     transition: "0.15s ease",
   },
   tabActive: {
-    flex: 1, padding: "12px", textAlign: "center",
-    background: "#222", color: "#D4A030",
-    border: "none", borderBottom: "2px solid #D4A030",
+    padding: "14px 32px",
+    background: "transparent", color: "#fff",
+    border: "none", borderBottom: "3px solid #E6B849",
     fontSize: "13px", fontWeight: 600, cursor: "pointer",
     transition: "0.15s ease",
   },
@@ -581,7 +580,7 @@ const st: Record<string, React.CSSProperties> = {
 
   // 卡片
   card: {
-    backgroundColor: "#1a1a1a", borderRadius: "8px",
+    backgroundColor: "#1E1E1E", borderRadius: "8px",
     border: "1px solid rgba(255,255,255,0.08)",
     overflow: "hidden",
   },
@@ -685,7 +684,7 @@ const st: Record<string, React.CSSProperties> = {
     fontSize: "12px", color: "rgba(255,255,255,0.45)",
   },
   rpValue: {
-    fontSize: "22px", fontWeight: 700, color: "#D4A030",
+    fontSize: "22px", fontWeight: 700, color: "#E6B849",
   },
 
   // 场均数据
@@ -698,7 +697,7 @@ const st: Record<string, React.CSSProperties> = {
     textAlign: "center",
   },
   statValue: {
-    fontSize: "26px", fontWeight: 700, color: "#D4A030",
+    fontSize: "26px", fontWeight: 700, color: "#E6B849",
     marginBottom: "4px",
   },
   statLabel: {
@@ -720,7 +719,7 @@ const st: Record<string, React.CSSProperties> = {
     padding: "8px 0",
   },
   loadingCard: {
-    backgroundColor: "#1a1a1a", borderRadius: "8px",
+    backgroundColor: "#1E1E1E", borderRadius: "8px",
     border: "1px solid rgba(255,255,255,0.08)",
     padding: "40px 20px", textAlign: "center",
   },

@@ -1,42 +1,120 @@
 "use client";
 
+import { useState } from "react";
 import type { QueryResult } from "@/lib/query";
+import type { WeaponMastery } from "@/lib/pubg";
 import { getSurvivalLevel } from "./PlayerHelpers";
+import { getWeaponCategory, getWeaponName, getMasteryTierLabel, WEAPON_CATEGORIES, type WeaponCategory } from "@/lib/weapon-categories";
 
-/** 精通 Tab — 生存专精 + 武器专精 */
+/* ═══════════════════════════════════════════
+   精通 Tab — 生存专精 + 武器专精（分类 + 卡片 + 详情弹窗）
+   ═══════════════════════════════════════════ */
 
+/* ─── 进度条 ──────────────────────────── */
 function Bar({ label, value, max, unit, color }: { label: string; value: number; max: number; unit: string; color: string }) {
   const pct = Math.min((value / Math.max(max, 1)) * 100, 100);
   return (
     <div style={{ marginBottom: "10px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
-        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>{label}</span>
+        <span style={{ fontSize: "11px", color: "#A3A3A3" }}>{label}</span>
         <span style={{ fontSize: "11px", fontWeight: 600, color }}>{value.toLocaleString()}{unit}</span>
       </div>
       <div style={{ height: "4px", background: "rgba(255,255,255,0.06)", borderRadius: "2px", overflow: "hidden" }}>
-        <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: "2px", transition: "0.3s" }} />
+        <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: "2px", transition: "width 0.3s" }} />
       </div>
     </div>
   );
 }
 
+/* ─── 武器详情弹窗 ─────────────────────── */
+function WeaponDetailModal({ weapon, onClose }: { weapon: WeaponMastery; onClose: () => void }) {
+  const name = getWeaponName(weapon.weaponId);
+  const tierLabel = getMasteryTierLabel(weapon.tier);
+
+  const rows = [
+    { label: "累计淘汰玩家", value: weapon.kills.toLocaleString() },
+    { label: "累计击倒玩家", value: (weapon as any).dbnoTotal?.toLocaleString() || "0" },
+    { label: "累计造成伤害", value: weapon.damageTotal.toLocaleString() },
+    { label: "累计爆头次数", value: weapon.headshots.toLocaleString() },
+    { label: "单局最多淘汰", value: weapon.mostDefeatsInGame.toLocaleString() },
+    { label: "最远淘汰距离", value: `${weapon.longestDefeat}m` },
+    { label: "累计命中次数", value: weapon.hitsTotal.toLocaleString() },
+    { label: "命中率", value: `${weapon.hitRatio || 0}%` },
+    { label: "总开火次数", value: weapon.shotsFired.toLocaleString() },
+  ];
+
+  return (
+    <div style={md.overlay} onClick={onClose}>
+      <div style={md.modal} onClick={e => e.stopPropagation()}>
+        {/* 头部 */}
+        <div style={md.head}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={md.icon}>
+              <img
+                src={`https://pubg-static.akamaized.net/gameassets/Weapons/Item_Weapon_${weapon.weaponId.toLowerCase().replace("weapon_","").replace("_c","")}.png`}
+                alt=""
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+              />
+            </div>
+            <div>
+              <div style={md.wpnName}>{name}</div>
+              <div style={md.wpnTier}>{tierLabel} · Lv.{weapon.level}</div>
+            </div>
+          </div>
+          <button onClick={onClose} style={md.closeBtn}>✕</button>
+        </div>
+
+        {/* 详情表格 */}
+        <div style={md.body}>
+          {rows.map((r, i) => (
+            <div key={i} style={md.row}>
+              <span style={md.rowLabel}>{r.label}</span>
+              <span style={md.rowValue}>{r.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   主组件
+   ═══════════════════════════════════════════ */
+
 export default function MasteryTab({ result }: { result: QueryResult }) {
   const { survivalMastery, weaponMastery } = result;
-
   const survival = survivalMastery;
-  const weapons = weaponMastery || [];
+  const weapons: WeaponMastery[] = weaponMastery || [];
+
+  const [filter, setFilter] = useState<WeaponCategory | "all">("all");
+  const [selectedWeapon, setSelectedWeapon] = useState<WeaponMastery | null>(null);
 
   if (!survival && weapons.length === 0) {
     return (
       <div style={ms.empty}>
         <div style={{ fontSize: "24px", marginBottom: "8px" }}>🔒</div>
-        <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>暂无专精数据</div>
+        <div style={{ fontSize: "13px", color: "#A3A3A3" }}>暂无专精数据</div>
         <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>首次查询后缓存 24 小时，稍后再试</div>
       </div>
     );
   }
 
   const survivalInfo = survival ? getSurvivalLevel(survival.xp) : null;
+
+  // 按分类过滤武器
+  const allWeapons = weapons.sort((a, b) => b.kills - a.kills);
+  const filteredWeapons = filter === "all"
+    ? allWeapons
+    : allWeapons.filter(w => getWeaponCategory(w.weaponId) === filter);
+
+  // 每个分类的数量
+  const catCounts: Record<string, number> = {};
+  allWeapons.forEach(w => {
+    const cat = getWeaponCategory(w.weaponId);
+    catCounts[cat] = (catCounts[cat] || 0) + 1;
+  });
 
   return (
     <div style={ms.wrap}>
@@ -48,7 +126,6 @@ export default function MasteryTab({ result }: { result: QueryResult }) {
             <span style={ms.headerMeta}>{survival.totalMatchesPlayed.toLocaleString()} 场</span>
           </div>
 
-          {/* 等级进度 */}
           <div style={{ padding: "16px", display: "flex", alignItems: "center", gap: "16px" }}>
             <div style={{
               width: "64px", height: "64px", borderRadius: "16px",
@@ -58,14 +135,14 @@ export default function MasteryTab({ result }: { result: QueryResult }) {
             }}>
               <div style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "20px", fontWeight: 700, color: "#fff", lineHeight: 1 }}>{survival.level}</div>
-                <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.7)" }}>Lv.{survival.level}</div>
+                <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.7)" }}>Lv.</div>
               </div>
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: "16px", fontWeight: 700, color: "#fff" }}>
                 {survivalInfo?.title || "未定级"}
               </div>
-              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginTop: "2px" }}>
+              <div style={{ fontSize: "12px", color: "#A3A3A3", marginTop: "2px" }}>
                 XP {survival.xp.toLocaleString()} · Tier {survival.tier}
               </div>
               <div style={{ marginTop: "8px", height: "4px", background: "rgba(255,255,255,0.08)", borderRadius: "2px", overflow: "hidden" }}>
@@ -74,10 +151,9 @@ export default function MasteryTab({ result }: { result: QueryResult }) {
             </div>
           </div>
 
-          {/* 生存数据 */}
           {survival.stats && (
             <div style={{ padding: "0 16px 14px" }}>
-              <Bar label="总伤害" value={survival.stats.damageDealt || 0} max={500000} unit="" color="#d4a030" />
+              <Bar label="总伤害" value={survival.stats.damageDealt || 0} max={500000} unit="" color="#E6B849" />
               <Bar label="承受伤害" value={survival.stats.damageTaken || 0} max={500000} unit="" color="#f87171" />
               <Bar label="徒步距离" value={Math.round((survival.stats.distanceOnFoot || 0) / 1000)} max={1000} unit="km" color="#4ade80" />
               <Bar label="载具距离" value={Math.round((survival.stats.distanceByVehicle || 0) / 1000)} max={2000} unit="km" color="#60a5fa" />
@@ -97,57 +173,248 @@ export default function MasteryTab({ result }: { result: QueryResult }) {
             <span>🔫 武器专精</span>
             <span style={ms.headerMeta}>{weapons.length} 种武器</span>
           </div>
-          <div style={{ padding: "8px 16px 14px" }}>
-            {weapons.slice(0, 8).map((w: any) => {
-              const name = w.weaponId?.replace(/^Weapon_/, "").replace(/_C$/, "") || "?";
-              const lvl = w.level || 1;
-              const lvlPct = Math.min((lvl / 100) * 100, 100);
+
+          {/* 分类筛选栏 */}
+          <div style={ms.filterBar}>
+            <button
+              onClick={() => setFilter("all")}
+              style={{ ...ms.filterBtn, ...(filter === "all" ? ms.filterBtnActive : {}) }}
+            >
+              全部 ({weapons.length})
+            </button>
+            {WEAPON_CATEGORIES.map(cat => {
+              const count = catCounts[cat.key] || 0;
+              if (count === 0) return null;
               return (
-                <div key={w.weaponId} style={{ marginBottom: "12px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>{name}</span>
-                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>
-                      Lv.{lvl} · {w.kills || 0} 击杀
-                    </span>
-                  </div>
-                  <div style={{ height: "4px", background: "rgba(255,255,255,0.06)", borderRadius: "2px", overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${lvlPct}%`, background: "#d4a030", borderRadius: "2px" }} />
-                  </div>
-                  <div style={{ display: "flex", gap: "16px", marginTop: "4px" }}>
-                    <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>
-                      爆头率 {w.hitRatio || 0}%
-                    </span>
-                    <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>
-                      最长 {w.longestDefeat || 0}m
-                    </span>
-                    <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>
-                      伤害 {((w.damageTotal || 0) / 1000).toFixed(0)}k
-                    </span>
-                  </div>
-                </div>
+                <button
+                  key={cat.key}
+                  onClick={() => setFilter(cat.key)}
+                  style={{ ...ms.filterBtn, ...(filter === cat.key ? ms.filterBtnActive : {}) }}
+                >
+                  {cat.label} ({count})
+                </button>
               );
             })}
           </div>
+
+          {/* 武器卡片网格 */}
+          {filteredWeapons.length > 0 ? (
+            <div style={ms.weaponGrid}>
+              {filteredWeapons.map(w => {
+                const name = getWeaponName(w.weaponId);
+                const tierLabel = getMasteryTierLabel(w.tier);
+                const imgUrl = `https://pubg-static.akamaized.net/gameassets/Weapons/Item_Weapon_${w.weaponId.toLowerCase().replace("weapon_","").replace("_c","")}.png`;
+                return (
+                  <div
+                    key={w.weaponId}
+                    style={ms.weaponCard}
+                    onClick={() => setSelectedWeapon(w)}
+                  >
+                    <div style={ms.weaponIcon}>
+                      <img
+                        src={imgUrl}
+                        alt={name}
+                        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                        onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                      />
+                    </div>
+                    <div style={ms.weaponInfo}>
+                      <div style={ms.weaponName}>{name}</div>
+                      <div style={ms.weaponMeta}>
+                        {w.kills.toLocaleString()} 淘汰 · {w.longestDefeat}m
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <div style={ms.weaponLevel}>{tierLabel}</div>
+                      <div style={ms.weaponLv}>Lv.{w.level}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ padding: "40px 0", textAlign: "center", color: "#A3A3A3", fontSize: "13px" }}>
+              该分类暂无武器数据
+            </div>
+          )}
+
+          {/* 武器总数统计 */}
+          <div style={ms.footer}>
+            <div style={{ display: "flex", gap: "16px" }}>
+              <span style={ms.footerStat}>
+                <span style={{ color: "#E6B849" }}>{allWeapons.reduce((s, w) => s + w.kills, 0).toLocaleString()}</span>
+                <span style={{ color: "#A3A3A3", marginLeft: "4px" }}>总淘汰</span>
+              </span>
+              <span style={ms.footerStat}>
+                <span style={{ color: "#E6B849" }}>{allWeapons.length}</span>
+                <span style={{ color: "#A3A3A3", marginLeft: "4px" }}>种武器</span>
+              </span>
+              <span style={ms.footerStat}>
+                <span style={{ color: "#E6B849" }}>{allWeapons.reduce((s, w) => s + w.damageTotal, 0).toLocaleString()}</span>
+                <span style={{ color: "#A3A3A3", marginLeft: "4px" }}>总伤害</span>
+              </span>
+            </div>
+          </div>
         </div>
+      )}
+
+      {/* ─── 武器详情弹窗 ──────────── */}
+      {selectedWeapon && (
+        <WeaponDetailModal
+          weapon={selectedWeapon}
+          onClose={() => setSelectedWeapon(null)}
+        />
       )}
     </div>
   );
 }
 
-const ms = {
-  wrap: { display: "flex", flexDirection: "column", gap: "10px" } as React.CSSProperties,
+/* ─── 样式 ────────────────────────────── */
+
+const ms: Record<string, React.CSSProperties> = {
+  wrap: { display: "flex", flexDirection: "column", gap: "12px" },
+
   card: {
-    background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E", border: "1px solid #333333",
     borderRadius: "8px", overflow: "hidden",
-  } as React.CSSProperties,
+  },
   header: {
     display: "flex", justifyContent: "space-between", alignItems: "center",
-    padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)",
+    padding: "14px 16px", borderBottom: "1px solid #333333",
     fontSize: "14px", fontWeight: 600, color: "#fff",
-  } as React.CSSProperties,
-  headerMeta: { fontSize: "11px", color: "rgba(255,255,255,0.4)", fontWeight: 400 } as React.CSSProperties,
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  },
+  headerMeta: { fontSize: "11px", color: "#A3A3A3", fontWeight: 400 },
+
   empty: {
-    background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)",
+    background: "#1E1E1E", border: "1px solid #333333",
     borderRadius: "8px", padding: "32px", textAlign: "center",
+  },
+
+  // 分类筛选
+  filterBar: {
+    display: "flex", gap: "2px", borderBottom: "1px solid #333333",
+    padding: "6px 8px", overflowX: "auto",
+    msOverflowStyle: "none", scrollbarWidth: "none",
   } as React.CSSProperties,
+  filterBtn: {
+    padding: "8px 14px", fontSize: "12px", background: "transparent",
+    color: "#A3A3A3", border: "none", cursor: "pointer",
+    whiteSpace: "nowrap", borderRadius: "4px",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  } as React.CSSProperties,
+  filterBtnActive: {
+    color: "#E6B849", fontWeight: 600,
+    background: "rgba(230,184,73,0.08)",
+  } as React.CSSProperties,
+
+  // 武器网格
+  weaponGrid: {
+    display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px",
+    padding: "14px",
+  },
+
+  // 武器卡片
+  weaponCard: {
+    background: "rgba(255,255,255,0.02)",
+    border: "1px solid #333333", borderRadius: "8px",
+    padding: "12px 14px", display: "flex", alignItems: "center", gap: "10px",
+    cursor: "pointer", transition: "background 0.15s, border-color 0.15s",
+  },
+
+  weaponIcon: {
+    width: "48px", height: "38px", borderRadius: "6px",
+    background: "rgba(255,255,255,0.04)",
+    flexShrink: 0, overflow: "hidden",
+    display: "flex", alignItems: "center", justifyContent: "center",
+  },
+
+  weaponInfo: { flex: 1, minWidth: 0 },
+
+  weaponName: {
+    fontSize: "13px", fontWeight: 600, color: "#fff",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+  },
+
+  weaponMeta: {
+    fontSize: "11px", color: "#A3A3A3", marginTop: "2px",
+    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+  },
+
+  weaponLevel: {
+    fontSize: "13px", color: "#E6B849", fontWeight: 700,
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    lineHeight: 1.3,
+  },
+
+  weaponLv: {
+    fontSize: "10px", color: "#A3A3A3",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  },
+
+  // 底部统计
+  footer: {
+    padding: "12px 16px", borderTop: "1px solid #333333",
+    display: "flex", alignItems: "center",
+  },
+  footerStat: {
+    fontSize: "12px",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  },
+};
+
+/* ─── 弹窗样式 ────────────────────────── */
+
+const md: Record<string, React.CSSProperties> = {
+  overlay: {
+    position: "fixed", inset: 0, zIndex: 100,
+    background: "rgba(0,0,0,0.7)", display: "flex",
+    alignItems: "center", justifyContent: "center",
+    padding: "20px",
+    backdropFilter: "blur(4px)",
+  },
+  modal: {
+    background: "#1E1E1E", border: "1px solid #333333",
+    borderRadius: "12px", width: "100%", maxWidth: "440px",
+    maxHeight: "80vh", overflow: "hidden",
+    display: "flex", flexDirection: "column",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+  },
+  head: {
+    display: "flex", justifyContent: "space-between", alignItems: "center",
+    padding: "20px", borderBottom: "1px solid #333333",
+  },
+  icon: {
+    width: "56px", height: "44px", borderRadius: "8px",
+    background: "rgba(255,255,255,0.04)", flexShrink: 0,
+    overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center",
+  },
+  wpnName: {
+    fontSize: "18px", fontWeight: 700, color: "#fff",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  },
+  wpnTier: {
+    fontSize: "13px", color: "#E6B849", fontWeight: 600, marginTop: "2px",
+  },
+  closeBtn: {
+    background: "none", border: "none", color: "#A3A3A3",
+    fontSize: "18px", cursor: "pointer", padding: "4px 8px",
+    borderRadius: "4px",
+  },
+  body: {
+    padding: "16px 20px", overflowY: "auto",
+    display: "flex", flexDirection: "column", gap: "10px",
+  },
+  row: {
+    display: "flex", justifyContent: "space-between",
+    padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)",
+  },
+  rowLabel: {
+    fontSize: "13px", color: "#A3A3A3",
+  },
+  rowValue: {
+    fontSize: "13px", fontWeight: 600, color: "#fff",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  },
 };

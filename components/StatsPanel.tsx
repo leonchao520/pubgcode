@@ -30,7 +30,7 @@ function TierBadge({ tier, subTier, rankPoints }: { tier: string; subTier: strin
       <img src={getTierImage(tier, subTier)} alt="" style={st.tierImg} />
       <div style={st.tierInfo}>
         <div style={st.tierName}>{getTierLabel(tier)} {getSubTierLabel(subTier)}</div>
-        <div style={st.tierRp}><span style={{ color: "#d4a030" }}>{rankPoints}</span> RP</div>
+        <div style={st.tierRp}><span style={{ color: "#E6B849" }}>{rankPoints}</span> RP</div>
       </div>
     </div>
   );
@@ -168,12 +168,12 @@ function RankedGrid({ stats: s }: { stats: GameModeStats & { rankPoints?: number
 
   return (
     <div style={sc.gridPad}>
-      <div className="resp-grid-3" style={{ gap: "6px" }}>
-        <StatBox label="K/D" value={kd.toFixed(2)} color="#d4a030" />
+      <div className="resp-grid-3" style={{ gap: "10px" }}>
+        <StatBox label="K/D" value={kd.toFixed(2)} color="#E6B849" />
         <StatBox label="场均伤害" value={avgDmg.toLocaleString()} color="#4ade80" />
         <StatBox label="场均排名" value={s.avgRank > 0 ? `#${s.avgRank.toFixed(1)}` : "?"} />
       </div>
-      <div className="resp-grid-4" style={{ marginTop: "8px", gap: "6px" }}>
+      <div className="resp-grid-4" style={{ marginTop: "8px", gap: "10px" }}>
         <StatBox label="击杀" value={s.kills.toLocaleString()} />
         <StatBox label="胜场" value={s.wins.toLocaleString()} />
         <StatBox label="胜率" value={`${winRate.toFixed(1)}%`} />
@@ -191,12 +191,12 @@ function NormalGrid({ stats: s }: { stats: GameModeStats }) {
 
   return (
     <div style={sc.gridPad}>
-      <div className="resp-grid-3" style={{ gap: "6px" }}>
-        <StatBox label="K/D" value={kd.toFixed(2)} color="#d4a030" />
+      <div className="resp-grid-3" style={{ gap: "10px" }}>
+        <StatBox label="K/D" value={kd.toFixed(2)} color="#E6B849" />
         <StatBox label="场均伤害" value={avgDmg.toLocaleString()} color="#4ade80" />
         <StatBox label="场次" value={s.matches.toLocaleString()} />
       </div>
-      <div className="resp-grid-4" style={{ marginTop: "8px", gap: "6px" }}>
+      <div className="resp-grid-4" style={{ marginTop: "8px", gap: "10px" }}>
         <StatBox label="击杀" value={s.kills.toLocaleString()} />
         <StatBox label="胜场" value={s.wins.toLocaleString()} />
         <StatBox label="助攻" value={s.assists.toLocaleString()} />
@@ -217,13 +217,13 @@ function LifetimePanel({ stats: s }: { stats: LifetimeStats }) {
     <div style={sc.gridPad}>
       {/* ⚔️ 战斗 */}
       <div style={sc.groupLabel}>⚔️ 战斗</div>
-      <div className="resp-grid-4" style={{ gap: "6px" }}>
-        <StatBox label="K/D" value={s.kda.toFixed(2)} color="#d4a030" />
+      <div className="resp-grid-4" style={{ gap: "10px" }}>
+        <StatBox label="K/D" value={s.kda.toFixed(2)} color="#E6B849" />
         <StatBox label="击杀" value={s.kills.toLocaleString()} />
         <StatBox label="胜场" value={s.wins.toLocaleString()} />
         <StatBox label="助攻" value={s.assists.toLocaleString()} />
       </div>
-      <div className="resp-grid-4" style={{ marginTop: "6px", gap: "6px" }}>
+      <div className="resp-grid-4" style={{ marginTop: "6px", gap: "10px" }}>
         <StatBox label="胜率" value={`${winRate}%`} color="#4ade80" />
         <StatBox label="Top10率" value={`${top10Rate}%`} color="#60a5fa" />
         <StatBox label="总伤害" value={s.damageDealt.toLocaleString()} />
@@ -231,7 +231,7 @@ function LifetimePanel({ stats: s }: { stats: LifetimeStats }) {
       </div>
       {/* 🎯 精准 */}
       <div style={{ ...sc.groupLabel, marginTop: "12px" }}>🎯 精准</div>
-      <div className="resp-grid-4" style={{ gap: "6px" }}>
+      <div className="resp-grid-4" style={{ gap: "10px" }}>
         <StatBox label="爆头击杀" value={s.headshotKills.toLocaleString()} />
         <StatBox label="爆头率" value={`${headshotRate}%`} />
         <StatBox label="最长击杀" value={`${s.longestKill}m`} />
@@ -239,7 +239,7 @@ function LifetimePanel({ stats: s }: { stats: LifetimeStats }) {
       </div>
       {/* ⏱️ 生存 */}
       <div style={{ ...sc.groupLabel, marginTop: "12px" }}>⏱️ 生存</div>
-      <div className="resp-grid-4" style={{ gap: "6px" }}>
+      <div className="resp-grid-4" style={{ gap: "10px" }}>
         <StatBox label="存活时长" value={`${survivedHrs}h`} />
         <StatBox label="Top10" value={s.top10s.toLocaleString()} />
         <StatBox label="平均排名" value={s.avgRank > 0 ? `#${s.avgRank.toFixed(1)}` : "?"} />
@@ -272,14 +272,14 @@ const navBtn = (disabled: boolean): React.CSSProperties => ({
 const sc = {
   wrap: { display: "flex", flexDirection: "column", gap: "10px" } as React.CSSProperties,
   card: {
-    background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E", border: "1px solid rgba(255,255,255,0.08)",
     borderRadius: "8px", overflow: "hidden",
   } as React.CSSProperties,
 
   // 赛季导航
   seasonNav: {
     display: "flex", alignItems: "center", justifyContent: "space-between",
-    background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E", border: "1px solid rgba(255,255,255,0.08)",
     borderRadius: "8px", padding: "12px 16px",
   } as React.CSSProperties,
   seasonCenter: {
@@ -293,18 +293,19 @@ const sc = {
     padding: "1px 8px", borderRadius: "4px", fontWeight: 600,
   } as React.CSSProperties,
 
-  // 类型 Tab
+  // 类型 Tab（二级子 Tab 样式）
   typeTabs: {
-    display: "flex", gap: "4px", justifyContent: "center",
+    display: "flex", justifyContent: "flex-start", gap: "0",
+    borderBottom: "1px solid #333333",
   } as React.CSSProperties,
   typeBtn: {
-    padding: "8px 24px", background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.45)",
-    border: "1px solid rgba(255,255,255,0.06)", borderRadius: "6px",
+    padding: "10px 28px", background: "transparent", color: "#A3A3A3",
+    border: "none", borderBottom: "3px solid transparent", borderRadius: 0,
     fontSize: "13px", cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   } as React.CSSProperties,
   typeActive: {
-    padding: "8px 24px", background: "rgba(212,160,48,0.12)", color: "#d4a030",
-    border: "1px solid rgba(212,160,48,0.3)", borderRadius: "6px",
+    padding: "10px 28px", background: "transparent", color: "#fff",
+    border: "none", borderBottom: "3px solid #E6B849", borderRadius: 0,
     fontSize: "13px", cursor: "pointer", fontWeight: 600, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   } as React.CSSProperties,
 
@@ -312,27 +313,28 @@ const sc = {
   modeHeader: {
     display: "flex", justifyContent: "space-between", alignItems: "center",
     padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)",
+    background: "#1E1E1E",
   } as React.CSSProperties,
   modeTitle: {
-    fontSize: "14px", fontWeight: 600, color: "#fff",
+    fontSize: "15px", fontWeight: 600, color: "#fff",
   } as React.CSSProperties,
   modeMeta: {
-    fontSize: "11px", color: "rgba(255,255,255,0.4)",
+    fontSize: "11px", color: "#A3A3A3",
   } as React.CSSProperties,
 
-  // 段位徽章
+  // 段位徽章（由 st.tierHero 使用）
   tierHero: {
     display: "flex", alignItems: "center", gap: "12px",
     padding: "0 16px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)",
   } as React.CSSProperties,
   tierImg: {
-    width: "48px", height: "48px", borderRadius: "8px",
+    width: "56px", height: "56px", borderRadius: "10px",
   } as React.CSSProperties,
   tierInfo: {
     display: "flex", flexDirection: "column", gap: "2px",
   } as React.CSSProperties,
   tierName: {
-    fontSize: "16px", fontWeight: 700, color: "#fff",
+    fontSize: "20px", fontWeight: 700, color: "#fff",
   } as React.CSSProperties,
   tierRp: {
     fontSize: "13px", color: "rgba(255,255,255,0.5)",
@@ -341,27 +343,26 @@ const sc = {
   // 数据区
   gridPad: { padding: "12px 16px 16px" } as React.CSSProperties,
   groupLabel: {
-    fontSize: "11px", fontWeight: 600, color: "rgba(255,255,255,0.4)",
+    fontSize: "11px", fontWeight: 600, color: "#A3A3A3",
     letterSpacing: "0.5px", marginBottom: "6px",
   } as React.CSSProperties,
 
   // 小方格
   statBox: {
-    background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.04)",
-    borderRadius: "6px", padding: "10px 8px", textAlign: "center",
+    background: "rgba(255,255,255,0.03)", border: "1px solid #333333",
+    borderRadius: "8px", padding: "10px 8px", textAlign: "center",
   } as React.CSSProperties,
   statValue: {
-    fontSize: "18px", fontWeight: 700, color: "#fff", marginBottom: "2px",
+    fontSize: "22px", fontWeight: 700, color: "#E6B849", marginBottom: "2px",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-    "--c": "#fff",
   } as React.CSSProperties,
   statLabel: {
-    fontSize: "10px", color: "rgba(255,255,255,0.4)",
+    fontSize: "11px", color: "#A3A3A3",
   } as React.CSSProperties,
 
   // 空状态
   empty: {
-    background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)",
+    background: "#1E1E1E", border: "1px solid #333333",
     borderRadius: "8px", padding: "32px 20px", textAlign: "center",
   } as React.CSSProperties,
   emptyIcon: { fontSize: "24px", marginBottom: "8px" } as React.CSSProperties,
@@ -371,22 +372,22 @@ const sc = {
 
 const st = {
   statBox: {
-    background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.04)",
-    borderRadius: "6px", padding: "10px 8px", textAlign: "center",
+    background: "rgba(255,255,255,0.03)", border: "1px solid #333333",
+    borderRadius: "8px", padding: "10px 8px", textAlign: "center",
   } as React.CSSProperties,
   statValue: {
-    fontSize: "18px", fontWeight: 700, color: "#fff", marginBottom: "2px",
+    fontSize: "22px", fontWeight: 700, color: "#E6B849", marginBottom: "2px",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   } as React.CSSProperties,
   statLabel: {
-    fontSize: "10px", color: "rgba(255,255,255,0.4)",
+    fontSize: "11px", color: "#A3A3A3",
   } as React.CSSProperties,
   tierHero: {
     display: "flex", alignItems: "center", gap: "12px",
     padding: "0 16px 12px", borderBottom: "1px solid rgba(255,255,255,0.04)",
   } as React.CSSProperties,
-  tierImg: { width: "48px", height: "48px", borderRadius: "8px" } as React.CSSProperties,
+  tierImg: { width: "56px", height: "56px", borderRadius: "10px" } as React.CSSProperties,
   tierInfo: { display: "flex", flexDirection: "column", gap: "2px" } as React.CSSProperties,
-  tierName: { fontSize: "16px", fontWeight: 700, color: "#fff" } as React.CSSProperties,
+  tierName: { fontSize: "20px", fontWeight: 700, color: "#fff" } as React.CSSProperties,
   tierRp: { fontSize: "13px", color: "rgba(255,255,255,0.5)" } as React.CSSProperties,
 };

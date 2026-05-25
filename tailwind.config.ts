@@ -12,13 +12,15 @@ const config = {
         sans: ["'DM Sans'", "sans-serif"],
       },
       colors: {
-        bg: "#000",
-        surface: "#111",
-        border: "rgba(255,255,255,0.1)",
-        accent: "#d4a030",
-        muted: "#555",
+        bg: "#121212",
+        surface: "#1E1E1E",
+        border: "#333333",
+        accent: "#E6B849",
+        accentMuted: "#d4a030",
+        muted: "#A3A3A3",
         text: "#fff",
         sub: "rgba(255,255,255,0.45)",
+        green: "#22A75D",
       },
       keyframes: {
         scan: {

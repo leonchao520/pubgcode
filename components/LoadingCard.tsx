@@ -5,7 +5,7 @@ export default function LoadingCard() {
       <div style={s.card}>
         <div style={{ ...s.row, borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "16px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{ width: "2px", height: "20px", background: "rgba(212,160,48,0.3)", borderRadius: "1px" }} />
+            <div style={{ width: "2px", height: "20px", background: "rgba(230,184,73,0.3)", borderRadius: "1px" }} />
             <div style={{ width: "60px", height: "14px", background: "rgba(255,255,255,0.06)", borderRadius: "4px" }} />
             <div style={{ width: "120px", height: "16px", background: "rgba(255,255,255,0.06)", borderRadius: "4px" }} />
           </div>
@@ -17,7 +17,7 @@ export default function LoadingCard() {
       <div style={s.card}>
         <div style={{ ...s.row, borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "14px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ width: "2px", height: "16px", background: "rgba(212,160,48,0.3)", borderRadius: "1px" }} />
+            <div style={{ width: "2px", height: "16px", background: "rgba(230,184,73,0.3)", borderRadius: "1px" }} />
             <div style={{ width: "100px", height: "13px", background: "rgba(255,255,255,0.05)", borderRadius: "4px" }} />
           </div>
         </div>
@@ -54,7 +54,7 @@ const s = {
 
   dot: (delay: number): React.CSSProperties => ({
     width: "4px", height: "4px", borderRadius: "50%",
-    background: "rgba(212,160,48,0.6)",
+    background: "rgba(230,184,73,0.6)",
     animation: `pulse2 1.2s ease-in-out ${delay}s infinite`,
   }),
 };

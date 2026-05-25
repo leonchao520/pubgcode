@@ -95,7 +95,7 @@ export default function OverviewTab({ result }: { result: QueryResult }) {
           <span>{seasonName} · 核心数据</span>
         </div>
         <div className="resp-grid-4" style={{ padding: "20px", gap: "20px" }}>
-          <KpiBox label="K/D" value={kd > 0 ? kd.toFixed(2) : "?"} color="#D4A030" />
+          <KpiBox label="K/D" value={kd > 0 ? kd.toFixed(2) : "?"} color="#E6B849" />
           <KpiBox label="场均伤害" value={avgDmg > 0 ? String(avgDmg) : "?"} color="#4ADE80" />
           <KpiBox label="吃鸡率" value={winRate > 0 ? `${(winRate * 100).toFixed(1)}%` : "?"} color="#FF6B6B" />
           <KpiBox label="场均排名" value={avgRank ? `#${avgRank.toFixed(1)}` : "?"} color="#22D3EE" />
@@ -179,12 +179,12 @@ function getTierColor(tier: string): string {
   const t = tier.toLowerCase();
   if (t.includes("bronze")) return "#8B5E3C";
   if (t.includes("silver")) return "#888";
-  if (t.includes("gold")) return "#D4A030";
+  if (t.includes("gold")) return "#E6B849";
   if (t.includes("platinum")) return "#40C9FF";
   if (t.includes("diamond")) return "#185ABD";
   if (t.includes("master")) return "#C4A6FF";
   if (t.includes("survivor")) return "#FF4D4D";
-  return "#d4a030";
+  return "#E6B849";
 }
 
 function getTierLabel(tier: string): string {
@@ -257,7 +257,7 @@ const st: Record<string, any> = {
   tierName: { fontSize: "12px", fontWeight: 700, color: "#000", lineHeight: "1.2" } as React.CSSProperties,
   tierSub: { fontSize: "16px", fontWeight: 700, color: "#000", lineHeight: "1.3" } as React.CSSProperties,
   tierRp: {
-    fontSize: "18px", fontWeight: 700, color: "#D4A030",
+    fontSize: "18px", fontWeight: 700, color: "#E6B849",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   } as React.CSSProperties,
   tierRpLabel: { fontSize: "10px", color: "rgba(255,255,255,0.4)" } as React.CSSProperties,
@@ -268,7 +268,7 @@ const st: Record<string, any> = {
     borderBottom: "1px solid rgba(255,255,255,0.06)",
     fontSize: "13px", fontWeight: 600, color: "#fff",
   } as React.CSSProperties,
-  accentBar: { width: "2px", height: "16px", background: "#D4A030", borderRadius: "1px" } as React.CSSProperties,
+  accentBar: { width: "2px", height: "16px", background: "#E6B849", borderRadius: "1px" } as React.CSSProperties,
 
   kpiGrid: {
     display: "grid", gridTemplateColumns: "1fr 1fr 1fr",

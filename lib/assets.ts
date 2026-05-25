@@ -24,7 +24,7 @@ export const MAP_INFO: Record<string, { name: string; color: string; emoji: stri
 export const TIER_COLORS: Record<string, { bg: string; text: string; label: string }> = {
   bronze:     { bg: "#8B5E3C", text: "#F5DEB3", label: "青铜" },
   silver:     { bg: "#888888", text: "#E0E0E0", label: "白银" },
-  gold:       { bg: "#D4A030", text: "#000000", label: "黄金" },
+  gold:       { bg: "#E6B849", text: "#000000", label: "黄金" },
   platinum:   { bg: "#40C9FF", text: "#000000", label: "铂金" },
   diamond:    { bg: "#185ABD", text: "#FFFFFF", label: "钻石" },
   master:     { bg: "#C4A6FF", text: "#000000", label: "大师" },

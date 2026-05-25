@@ -8,12 +8,12 @@ import type { QueryResult } from "@/lib/query";
 function StatCell({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div style={{
-      background: highlight ? "rgba(212,160,48,0.08)" : "rgba(255,255,255,0.02)",
-      border: highlight ? "1px solid rgba(212,160,48,0.15)" : "1px solid rgba(255,255,255,0.04)",
-      borderRadius: "6px", padding: "10px 8px", textAlign: "center",
+      background: highlight ? "rgba(230,184,73,0.08)" : "rgba(255,255,255,0.03)",
+      border: highlight ? "1px solid rgba(230,184,73,0.2)" : "1px solid #333333",
+      borderRadius: "8px", padding: "10px 8px", textAlign: "center",
     }}>
-      <div style={{ fontSize: "17px", fontWeight: 700, color: highlight ? "#d4a030" : "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", marginBottom: "2px" }}>{value}</div>
-      <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)" }}>{label}</div>
+      <div style={{ fontSize: "22px", fontWeight: 700, color: "#E6B849", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", marginBottom: "2px" }}>{value}</div>
+      <div style={{ fontSize: "10px", color: "#A3A3A3" }}>{label}</div>
     </div>
   );
 }
@@ -119,7 +119,7 @@ export default function StatsTab({ result }: { result: QueryResult }) {
                     <tr key={mode} style={s.tr}>
                       <td style={s.td}>{labels[mode] || mode}</td>
                       <td style={s.td}>{m2}</td>
-                      <td style={{...s.td, color: "#d4a030"}}>{kd2}</td>
+                      <td style={{...s.td, color: "#E6B849"}}>{kd2}</td>
                       <td style={s.td}>{wr2}</td>
                       <td style={s.td}>{ad2}</td>
                     </tr>
@@ -145,33 +145,33 @@ export default function StatsTab({ result }: { result: QueryResult }) {
 const s = {
   wrap: { display: "flex", flexDirection: "column", gap: "10px" } as React.CSSProperties,
   card: {
-    background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E", border: "1px solid rgba(255,255,255,0.08)",
     borderRadius: "8px", overflow: "hidden",
   } as React.CSSProperties,
   header: {
     display: "flex", justifyContent: "space-between", alignItems: "center",
-    padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.04)",
+    padding: "14px 16px", borderBottom: "1px solid #333333",
     fontSize: "14px", fontWeight: 600, color: "#fff",
   } as React.CSSProperties,
-  headerMeta: { fontSize: "11px", color: "rgba(255,255,255,0.4)", fontWeight: 400 } as React.CSSProperties,
+  headerMeta: { fontSize: "11px", color: "#A3A3A3", fontWeight: 400 } as React.CSSProperties,
   sectionTitle: {
     padding: "12px 16px 8px", fontSize: "12px", fontWeight: 600,
-    color: "rgba(255,255,255,0.5)",
+    color: "#A3A3A3",
   } as React.CSSProperties,
   table: {
     width: "100%", borderCollapse: "collapse" as const, fontSize: "12px",
   } as React.CSSProperties,
   th: {
-    textAlign: "left" as const, padding: "8px 8px", color: "rgba(255,255,255,0.4)",
-    fontWeight: 500, borderBottom: "1px solid rgba(255,255,255,0.06)",
+    textAlign: "left" as const, padding: "8px 8px", color: "#A3A3A3",
+    fontWeight: 500, borderBottom: "1px solid #333333",
   } as React.CSSProperties,
-  tr: { borderBottom: "1px solid rgba(255,255,255,0.03)" } as React.CSSProperties,
+  tr: { borderBottom: "1px solid #333333" } as React.CSSProperties,
   td: {
-    padding: "8px 8px", color: "rgba(255,255,255,0.7)",
+    padding: "8px 8px", color: "#A3A3A3",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   } as React.CSSProperties,
   empty: {
-    background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.06)",
+    background: "#1E1E1E", border: "1px solid #333333",
     borderRadius: "8px", padding: "32px", textAlign: "center",
   } as React.CSSProperties,
 };

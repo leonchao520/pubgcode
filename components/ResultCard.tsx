@@ -144,7 +144,7 @@ const st = {
   cardHeaderLeft: { display: "flex", alignItems: "center", gap: "12px" } as React.CSSProperties,
   cardHeaderRight: { display: "flex", alignItems: "center", gap: "10px" } as React.CSSProperties,
 
-  accentBar: { width: "2px", height: "20px", background: "#d4a030", borderRadius: "1px" } as React.CSSProperties,
+  accentBar: { width: "2px", height: "20px", background: "#E6B849", borderRadius: "1px" } as React.CSSProperties,
 
   label: {
     fontSize: "10px", color: "rgba(255,255,255,0.45)", letterSpacing: "1.5px",
@@ -201,5 +201,5 @@ const st = {
 
   errorTitle: { fontSize: "14px", fontWeight: 600, color: "#f87171", marginBottom: "8px" } as React.CSSProperties,
   errorMsg: { fontSize: "13px", color: "rgba(255,255,255,0.5)", marginBottom: "12px" } as React.CSSProperties,
-  backLink: { color: "#d4a030", fontSize: "13px", textDecoration: "none" } as React.CSSProperties,
+  backLink: { color: "#E6B849", fontSize: "13px", textDecoration: "none" } as React.CSSProperties,
 };

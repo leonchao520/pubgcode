@@ -40,15 +40,15 @@ function getTierColor(tier: string): string {
   if (t.includes("master")) return "#C4A6FF";
   if (t.includes("diamond")) return "#40C9FF";
   if (t.includes("platinum")) return "#2ECC71";
-  if (t.includes("gold")) return "#D4A030";
+  if (t.includes("gold")) return "#E6B849";
   if (t.includes("silver")) return "#888";
   if (t.includes("bronze")) return "#8B5E3C";
   return "#888";
 }
 
 function rankBadgeStyle(rank: number): React.CSSProperties {
-  if (rank === 1) return { background: "#D4A030", color: "#000", fontWeight: 700, width: "24px", height: "24px", borderRadius: "6px", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "12px" };
-  if (rank <= 3) return { background: "rgba(212,160,48,0.15)", color: "#D4A030", fontWeight: 700, width: "24px", height: "24px", borderRadius: "6px", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "12px" };
+  if (rank === 1) return { background: "#E6B849", color: "#000", fontWeight: 700, width: "24px", height: "24px", borderRadius: "6px", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "12px" };
+  if (rank <= 3) return { background: "rgba(230,184,73,0.15)", color: "#E6B849", fontWeight: 700, width: "24px", height: "24px", borderRadius: "6px", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "12px" };
   return { color: "rgba(255,255,255,0.5)", fontWeight: 600, fontSize: "13px" };
 }
 
@@ -63,7 +63,7 @@ const s: Record<string, React.CSSProperties> = {
   container: { width: "100%", maxWidth: "960px", margin: "0 auto" },
   header: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", marginBottom: "20px" },
   title: { fontSize: "22px", fontWeight: 700, letterSpacing: "-0.5px" },
-  back: { color: "#D4A030", textDecoration: "none", fontSize: "14px", fontWeight: 500 },
+  back: { color: "#E6B849", textDecoration: "none", fontSize: "14px", fontWeight: 500 },
   shardRow: { display: "flex", gap: "6px", marginBottom: "16px", flexWrap: "wrap" },
   modeRow: { display: "flex", gap: "8px", marginBottom: "20px", alignItems: "center", flexWrap: "wrap" },
   modeGroupLabel: { fontSize: "12px", color: "rgba(255,255,255,0.35)", minWidth: "32px" },
@@ -126,9 +126,9 @@ export default function LeaderboardPage() {
             return (
             <button key={id} onClick={() => setShard(id)} style={{
               padding: "8px 16px", borderRadius: "8px",
-              border: `1px solid ${active ? "#D4A030" : "rgba(255,255,255,0.1)"}`,
-              background: active ? "rgba(212,160,48,0.12)" : "#111",
-              color: active ? "#D4A030" : "rgba(255,255,255,0.6)",
+              border: `1px solid ${active ? "#E6B849" : "rgba(255,255,255,0.1)"}`,
+              background: active ? "rgba(230,184,73,0.12)" : "#111",
+              color: active ? "#E6B849" : "rgba(255,255,255,0.6)",
               fontSize: "13px", fontWeight: 500, cursor: "pointer", transition: "0.15s",
             }}>
               {label}
@@ -146,9 +146,9 @@ export default function LeaderboardPage() {
                 return (
               <button key={m} onClick={() => setMode(m)} style={{
                 padding: "6px 14px", borderRadius: "6px",
-                border: `1px solid ${active ? "#D4A030" : "rgba(255,255,255,0.08)"}`,
-                background: active ? "rgba(212,160,48,0.12)" : "transparent",
-                color: active ? "#D4A030" : "rgba(255,255,255,0.5)",
+                border: `1px solid ${active ? "#E6B849" : "rgba(255,255,255,0.08)"}`,
+                background: active ? "rgba(230,184,73,0.12)" : "transparent",
+                color: active ? "#E6B849" : "rgba(255,255,255,0.5)",
                 fontSize: "12px", fontWeight: 600, cursor: "pointer", transition: "0.15s",
               }}>
                 {m.endsWith("-fpp") ? "FPP" : "TPP"}
@@ -165,7 +165,7 @@ export default function LeaderboardPage() {
         {error && !loading && (
           <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "8px", padding: "20px", textAlign: "center" }}>
             <p style={{ color: "#f87171", fontSize: "14px" }}>{error}</p>
-            <button onClick={() => fetchData(shard, mode)} style={{ marginTop: "12px", padding: "8px 20px", borderRadius: "6px", border: "none", background: "#D4A030", color: "#000", fontWeight: 600, cursor: "pointer", fontSize: "13px" }}>
+            <button onClick={() => fetchData(shard, mode)} style={{ marginTop: "12px", padding: "8px 20px", borderRadius: "6px", border: "none", background: "#E6B849", color: "#000", fontWeight: 600, cursor: "pointer", fontSize: "13px" }}>
               重试
             </button>
           </div>
@@ -206,7 +206,7 @@ export default function LeaderboardPage() {
                         <span style={{ color: getTierColor(p.tier) }}>{getTierLabel(p.tier, p.subTier)}</span>
                       </span>
                     </td>
-                    <td style={{ ...s.tdRight }}><span style={{ fontWeight: 600, color: "#D4A030" }}>{p.rankPoints.toLocaleString()}</span></td>
+                    <td style={{ ...s.tdRight }}><span style={{ fontWeight: 600, color: "#E6B849" }}>{p.rankPoints.toLocaleString()}</span></td>
                     <td style={{ ...s.tdRight, color: "rgba(255,255,255,0.7)" }}>{p.winRatio}%</td>
                     <td style={{ ...s.tdRight, color: "rgba(255,255,255,0.7)" }}>{p.kda}</td>
                     <td style={{ ...s.tdRight, color: "rgba(255,255,255,0.7)" }}>{Math.round(p.averageDamage)}</td>

@@ -5,7 +5,7 @@ export function getTierColor(tier: string): string {
   const t = tier.toLowerCase();
   if (t.includes("bronze")) return "#8B5E3C";
   if (t.includes("silver")) return "#888";
-  if (t.includes("gold")) return "#D4A030";
+  if (t.includes("gold")) return "#E6B849";
   if (t.includes("platinum")) return "#40C9FF";
   if (t.includes("diamond")) return "#185ABD";
   if (t.includes("master")) return "#C4A6FF";

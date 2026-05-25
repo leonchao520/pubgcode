@@ -80,6 +80,7 @@ function MatchCard({ match: m, onSelect }: { match: MatchSummary; onSelect?: (m:
   const survived = formatTime(m.playerStats.timeSurvived);
   const when = timeAgo(m.createdAt);
   const hasTeam = m.teamPlayers.length > 1;
+  const rankColor = place >= 1 && place <= 3 ? "#E6B849" : place >= 4 && place <= 10 ? "#fff" : "#A3A3A3";
 
   function handleClick(e: React.MouseEvent) {
     if ((e.target as HTMLElement).closest("[data-expand]")) {
@@ -93,13 +94,13 @@ function MatchCard({ match: m, onSelect }: { match: MatchSummary; onSelect?: (m:
     <div style={s.matchCard} onClick={handleClick}>
       <div style={s.rankCol}>
         <span style={s.rankEmoji}>{placeEmoji(place)}</span>
-        <span style={s.rankText}>{rankLabel}</span>
+        <span style={{ ...s.rankText, color: rankColor }}>{rankLabel}</span>
       </div>
 
       {/* 中间：数据 */}
       <div style={s.dataCol}>
         <div style={s.kdaLine}>
-          <span style={{ color: "#fff", fontWeight: 600 }}>{m.playerStats.kill}杀</span>
+          <span style={{ color: "#fff", fontWeight: 700 }}>{m.playerStats.kill}杀</span>
           {m.playerStats.assist > 0 && (
             <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>{m.playerStats.assist}助攻</span>
           )}
@@ -107,7 +108,7 @@ function MatchCard({ match: m, onSelect }: { match: MatchSummary; onSelect?: (m:
             <span style={{ color: "rgba(255,255,255,0.45)", fontSize: "11px" }}>{m.playerStats.dbno}击倒</span>
           )}
           <span style={s.kdaDivider}>/</span>
-          <span style={{ color: "rgba(255,255,255,0.5)" }}>{m.playerStats.damage.toLocaleString()}伤害</span>
+          <span style={{ color: "#A3A3A3" }}>{m.playerStats.damage.toLocaleString()}伤害</span>
           <span style={s.kdaDivider}>/</span>
           <span style={{ color: "rgba(255,255,255,0.5)" }}>{survived}</span>
         </div>
@@ -119,7 +120,7 @@ function MatchCard({ match: m, onSelect }: { match: MatchSummary; onSelect?: (m:
             border: `1px solid ${MAP_INFO[m.mapName]?.color ? `${MAP_INFO[m.mapName].color}30` : "rgba(255,255,255,0.06)"}`,
           }}>
             <span style={{ fontSize: "11px" }}>{MAP_INFO[m.mapName]?.emoji || "🗺️"}</span>
-            <span style={{ color: MAP_INFO[m.mapName]?.color || "rgba(255,255,255,0.5)", fontSize: "11px", fontWeight: 500 }}>
+            <span style={{ color: "#A3A3A3", fontSize: "11px", fontWeight: 500 }}>
               {MAP_INFO[m.mapName]?.name || mapName}
             </span>
           </span>
@@ -167,8 +168,8 @@ function TeamDetail({ players }: { players: MatchSummary["teamPlayers"] }) {
 
 const s = {
   card: {
-    background: "#0d0d0d",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E",
+    border: "1px solid #333333",
     borderRadius: "8px",
     overflow: "hidden",
   } as React.CSSProperties,
@@ -178,11 +179,11 @@ const s = {
     alignItems: "center",
     gap: "10px",
     padding: "14px 20px",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
+    borderBottom: "1px solid #333333",
   } as React.CSSProperties,
 
   accentBar: {
-    width: "2px", height: "16px", background: "#d4a030", borderRadius: "1px",
+    width: "2px", height: "16px", background: "#E6B849", borderRadius: "1px",
   } as React.CSSProperties,
 
   title: {
@@ -199,7 +200,7 @@ const s = {
     alignItems: "flex-start",
     flexWrap: "wrap",
     padding: "14px 20px",
-    borderBottom: "1px solid rgba(255,255,255,0.03)",
+    borderBottom: "1px solid #333333",
     gap: "14px",
     cursor: "pointer",
     transition: "background 0.15s",
@@ -221,7 +222,7 @@ const s = {
 
   rankText: {
     fontSize: "11px",
-    color: "rgba(255,255,255,0.5)",
+    color: "#A3A3A3",
     fontWeight: 500,
     marginTop: "2px",
   } as React.CSSProperties,
@@ -267,7 +268,7 @@ const s = {
 
   timeText: {
     fontSize: "10px",
-    color: "rgba(255,255,255,0.5)",
+    color: "#A3A3A3",
   } as React.CSSProperties,
 
   expandIcon: {
@@ -279,12 +280,12 @@ const s = {
     width: "100%",
     marginTop: "10px",
     paddingTop: "10px",
-    borderTop: "1px solid rgba(255,255,255,0.04)",
+    borderTop: "1px solid #333333",
   } as React.CSSProperties,
 
   teamHeader: {
     fontSize: "10px",
-    color: "rgba(255,255,255,0.4)",
+    color: "#A3A3A3",
     letterSpacing: "1px",
     marginBottom: "8px",
   } as React.CSSProperties,
@@ -298,7 +299,7 @@ const s = {
 
   teamName: {
     fontSize: "12px",
-    color: "rgba(255,255,255,0.6)",
+    color: "#A3A3A3",
     maxWidth: "120px",
     overflow: "hidden",
     textOverflow: "ellipsis",
@@ -312,7 +313,7 @@ const s = {
 
   teamStat: {
     fontSize: "11px",
-    color: "rgba(255,255,255,0.5)",
+    color: "#A3A3A3",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   } as React.CSSProperties,
 };

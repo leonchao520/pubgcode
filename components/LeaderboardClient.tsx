@@ -109,7 +109,7 @@ export default function LeaderboardClient() {
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
           <h1 style={lg.title}>
-            PUBG<span style={{ color: "#D4A030" }}>.</span>BAR
+            PUBG<span style={{ color: "#E6B849" }}>.</span>BAR
           </h1>
           <p style={lg.subtitle}>竞技排行榜</p>
         </div>
@@ -193,7 +193,7 @@ export default function LeaderboardClient() {
                   <span style={{ width: "70px", textAlign: "center", flexShrink: 0 }}>
                     {tierBadge(p.tier, p.subTier)}
                   </span>
-                  <span style={{ width: "68px", textAlign: "right", flexShrink: 0, fontSize: "13px", fontWeight: 700, color: "#D4A030" }}>
+                  <span style={{ width: "68px", textAlign: "right", flexShrink: 0, fontSize: "13px", fontWeight: 700, color: "#E6B849" }}>
                     {p.rankPoints.toLocaleString()}
                   </span>
                   <span style={{ width: "50px", textAlign: "right", flexShrink: 0, fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
@@ -248,8 +248,8 @@ const lg = {
     cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   } as React.CSSProperties,
   btnActive: {
-    padding: "5px 12px", background: "rgba(212,160,48,0.12)", color: "#D4A030",
-    border: "1px solid rgba(212,160,48,0.3)", borderRadius: "6px", fontSize: "12px",
+    padding: "5px 12px", background: "rgba(230,184,73,0.12)", color: "#E6B849",
+    border: "1px solid rgba(230,184,73,0.3)", borderRadius: "6px", fontSize: "12px",
     cursor: "pointer", fontWeight: 600, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   } as React.CSSProperties,
   error: { color: "#ef4444", fontSize: "12px", textAlign: "center", marginBottom: "12px" } as React.CSSProperties,
@@ -263,7 +263,7 @@ const lg = {
   } as React.CSSProperties,
   podiumRank: { fontSize: "28px" } as React.CSSProperties,
   podiumName: { fontSize: "14px", fontWeight: 700, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" } as React.CSSProperties,
-  podiumRp: { fontSize: "16px", fontWeight: 700, color: "#D4A030" } as React.CSSProperties,
+  podiumRp: { fontSize: "16px", fontWeight: 700, color: "#E6B849" } as React.CSSProperties,
   podiumStats: { display: "flex", flexDirection: "column", gap: "2px", fontSize: "11px", color: "rgba(255,255,255,0.45)" } as React.CSSProperties,
   listCard: {
     background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)",

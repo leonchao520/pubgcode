@@ -33,7 +33,7 @@ export default async function HistoryPage({ searchParams }: Props) {
         {/* Title */}
         <div style={{ marginBottom: "28px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "2px", marginBottom: "2px" }}>
-            <div style={{ width: "2px", height: "22px", background: "#D4A030", borderRadius: "1px", marginRight: "8px" }} />
+            <div style={{ width: "2px", height: "22px", background: "#E6B849", borderRadius: "1px", marginRight: "8px" }} />
             <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#fff", letterSpacing: "-0.5px", margin: 0 }}>查询历史</h1>
           </div>
           <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginLeft: "12px", margin: "4px 0 0 12px" }}>

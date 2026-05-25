@@ -74,7 +74,7 @@ export default function HistoryClient({ data, initialQ, initialType }: Props) {
       <div className="stats-card-grid">
         {[
           { label: "总查询", value: stats.totalAll.toLocaleString() },
-          { label: "成功率", value: `${successRate}%`, c: successRate >= 90 ? "#D4A030" : "#fff" },
+          { label: "成功率", value: `${successRate}%`, c: successRate >= 90 ? "#E6B849" : "#fff" },
           { label: "昵称", value: stats.totalName.toLocaleString() },
           { label: "Steam ID", value: stats.totalSteam.toLocaleString() },
         ].map(({ label, value, c }) => (
@@ -123,7 +123,7 @@ export default function HistoryClient({ data, initialQ, initialType }: Props) {
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", alignItems: "center" }}>
             <span style={s.listCount}>共 {displayTotal} 条</span>
-            {isPending && <span style={{ fontSize: "11px", color: "#D4A030" }}>加载中...</span>}
+            {isPending && <span style={{ fontSize: "11px", color: "#E6B849" }}>加载中...</span>}
           </div>
 
           {activeLogs.length === 0 ? (
@@ -139,7 +139,7 @@ export default function HistoryClient({ data, initialQ, initialType }: Props) {
               {activeLogs.map((log) => (
                 <Link key={log.input + log.createdAt} href={`/player/${encodeURIComponent(log.input)}`} style={s.tableRow}>
                   <span style={s.tableInput(log.type)}>{log.input}</span>
-                  <span style={{ ...s.tag, color: log.type === "name" ? "#60A5FA" : "#D4A030", background: log.type === "name" ? "rgba(96,165,250,0.1)" : "rgba(212,160,48,0.1)", width: "50px", textAlign: "center" }}>
+                  <span style={{ ...s.tag, color: log.type === "name" ? "#60A5FA" : "#E6B849", background: log.type === "name" ? "rgba(96,165,250,0.1)" : "rgba(230,184,73,0.1)", width: "50px", textAlign: "center" }}>
                     {log.type === "name" ? "昵称" : "Steam"}
                   </span>
                   <span style={{ ...s.tag, color: log.success ? "#4ADE80" : "#F87171", background: log.success ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)", width: "50px", textAlign: "center" }}>
@@ -174,7 +174,7 @@ export default function HistoryClient({ data, initialQ, initialType }: Props) {
           {favorites.length > 0 && (
             <div>
               <div style={s.sidebarHdr}>
-                <div style={{ ...s.accentBar, background: "#D4A030" }} />
+                <div style={{ ...s.accentBar, background: "#E6B849" }} />
                 <span>⭐ 收藏</span>
               </div>
               <div style={s.sidebarList}>
@@ -253,7 +253,7 @@ function PlayerRow({ player }: { player: PlayerItem }) {
       </Link>
       <button
         onClick={toggleFav}
-        style={{ ...s.starBtn, color: faved ? "#D4A030" : "rgba(255,255,255,0.4)", opacity: faved ? 1 : 0.4 }}
+        style={{ ...s.starBtn, color: faved ? "#E6B849" : "rgba(255,255,255,0.4)", opacity: faved ? 1 : 0.4 }}
         title="收藏"
       >
         {faved ? "★" : "☆"}
@@ -286,13 +286,13 @@ const s: Record<string, React.CSSProperties | any> = {
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
   filterActive: {
-    padding: "10px 14px", background: "rgba(212,160,48,0.1)", color: "#D4A030",
-    border: "1px solid rgba(212,160,48,0.3)", borderRadius: "6px",
+    padding: "10px 14px", background: "rgba(230,184,73,0.1)", color: "#E6B849",
+    border: "1px solid rgba(230,184,73,0.3)", borderRadius: "6px",
     fontSize: "12px", cursor: "pointer", fontWeight: 600,
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
   searchBtn: {
-    padding: "10px 18px", background: "#D4A030", color: "#000",
+    padding: "10px 18px", background: "#E6B849", color: "#000",
     border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
@@ -339,7 +339,7 @@ const s: Record<string, React.CSSProperties | any> = {
   sidebarHdr: {
     display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", padding: "0 4px",
   },
-  accentBar: { width: "2px", height: "14px", background: "#D4A030", borderRadius: "1px" },
+  accentBar: { width: "2px", height: "14px", background: "#E6B849", borderRadius: "1px" },
   sidebarList: { display: "flex", flexDirection: "column", gap: "2px" },
 
   playerRow: {
@@ -365,8 +365,8 @@ const s: Record<string, React.CSSProperties | any> = {
 
   favItem: {
     display: "flex", alignItems: "center",
-    background: "rgba(212,160,48,0.06)", borderRadius: "6px",
-    border: "1px solid rgba(212,160,48,0.12)",
+    background: "rgba(230,184,73,0.06)", borderRadius: "6px",
+    border: "1px solid rgba(230,184,73,0.12)",
   },
   favLink: {
     flex: 1, padding: "8px 10px", textDecoration: "none",

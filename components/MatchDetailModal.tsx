@@ -82,7 +82,7 @@ export default function MatchDetailModal({ match, onClose }: { match: MatchSumma
 
         {/* 4 大核心 KPI */}
         <div style={md.kpiGrid} className="resp-grid-4">
-          <KpiBox label="击杀" value={String(ps.kill)} color="#D4A030" />
+          <KpiBox label="击杀" value={String(ps.kill)} color="#E6B849" />
           <KpiBox label="伤害" value={ps.damage.toLocaleString()} color="#F87171" />
           <KpiBox label="存活" value={fmtTime(ps.timeSurvived)} color="#60A5FA" />
           <KpiBox label="最远击杀" value={`${ps.longestKill}m`} color="#22D3EE" />
@@ -124,11 +124,11 @@ export default function MatchDetailModal({ match, onClose }: { match: MatchSumma
               <span style={{ flex: 1, textAlign: "center" }}>存活</span>
             </div>
             {match.teamPlayers.slice(0, 4).map((p, i) => (
-              <div key={i} style={{ ...md.teamRow, background: p.name === ps.name ? "rgba(212,160,48,0.08)" : "transparent" }}>
-                <span style={{ width: "90px", fontSize: "12px", color: p.name === ps.name ? "#D4A030" : "rgba(255,255,255,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div key={i} style={{ ...md.teamRow, background: p.name === ps.name ? "rgba(230,184,73,0.08)" : "transparent" }}>
+                <span style={{ width: "90px", fontSize: "12px", color: p.name === ps.name ? "#E6B849" : "rgba(255,255,255,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {p.name === ps.name ? "👤 " : ""}{p.name}
                 </span>
-                <span style={{ flex: 1, textAlign: "center", fontSize: "12px", color: p.kill >= 5 ? "#D4A030" : "rgba(255,255,255,0.5)", fontWeight: 600 }}>{p.kill}</span>
+                <span style={{ flex: 1, textAlign: "center", fontSize: "12px", color: p.kill >= 5 ? "#E6B849" : "rgba(255,255,255,0.5)", fontWeight: 600 }}>{p.kill}</span>
                 <span style={{ flex: 1, textAlign: "center", fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>{p.damage.toLocaleString()}</span>
                 <span style={{ flex: 1, textAlign: "center", fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>{p.dbno}</span>
                 <span style={{ flex: 1, textAlign: "center", fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{fmtTime(p.timeSurvived)}</span>
