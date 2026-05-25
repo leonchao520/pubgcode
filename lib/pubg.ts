@@ -434,6 +434,10 @@ export interface WeaponMastery {
   shotsHit: number;
   hitsTotal: number;
   hitRatio: number;
+  /** 累计击倒数 */
+  dbnoTotal?: number;
+  /** 单局最多击倒 */
+  mostDbnoInGame?: number;
 }
 
 /** 获取武器专精数据 */
@@ -444,29 +448,32 @@ export async function fetchWeaponMastery(playerId: string): Promise<WeaponMaster
   );
   if (!res.ok) return [];
   const json = await res.json();
-  const data = json.data || [];
 
-  return data.map((item: any) => {
-    const attrs = item.attributes || {};
-    const stats = attrs.weaponSummaries || {};
-    const entry = stats[Object.keys(stats)[0]] || {};
-    const shotsFired = entry.shotsFired || 0;
-    const shotsHit = entry.shotsHit || 0;
+  // API 返回 { data: { attributes: { weaponSummaries: { "Item_Weapon_XXX_C": {...} } } } }
+  const summaries = json.data?.attributes?.weaponSummaries || {};
+
+  return Object.entries(summaries).map(([weaponId, summary]: [string, any]) => {
+    const stats = summary.StatsTotal || {};
+    const shotsFired = stats.ShotsFired || 0;
+    const shotsHit = stats.ShotsHit || 0;
     return {
-      weaponId: attrs.weaponId || "?",
-      level: entry.xp ? Math.min(Math.floor((entry.xp || 0) / 1000) + 1, 100) : entry.level || 1,
-      damageTotal: entry.damageTotal || 0,
-      kills: entry.kills || 0,
-      headshots: entry.headshots || 0,
-      defeats: entry.defeats || 0,
-      longestDefeat: Math.round(entry.longestDefeat || 0),
-      mostDefeatsInGame: entry.mostDefeatsInGame || 0,
-      tier: entry.tier || 1,
-      xp: entry.xp || 0,
+      weaponId,
+      level: summary.LevelCurrent || 1,
+      damageTotal: stats.DamagePlayer || 0,
+      kills: stats.Kills || 0,
+      headshots: stats.HeadShots || 0,
+      defeats: stats.Defeats || 0,
+      longestDefeat: Math.round(stats.LongestDefeat || 0),
+      mostDefeatsInGame: stats.MostKillsInAGame || 0,
+      tier: summary.TierCurrent || 1,
+      xp: summary.XPTotal || 0,
       shotsFired,
       shotsHit,
-      hitsTotal: entry.hitsTotal || 0,
+      hitsTotal: stats.HitsTotal || 0,
       hitRatio: shotsFired > 0 ? Math.round((shotsHit / shotsFired) * 100) : 0,
+      // 额外字段 — 击倒相关
+      dbnoTotal: stats.Groggies || 0,
+      mostDbnoInGame: stats.MostGroggiesInAGame || 0,
     };
   }).sort((a: WeaponMastery, b: WeaponMastery) => b.kills - a.kills);
 }

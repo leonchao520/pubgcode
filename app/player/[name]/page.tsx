@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { queryPlayer } from "@/lib/query";
 import PlayerOverview from "@/components/PlayerOverview";
 
+export const revalidate = 0; // 禁用缓存，每次请求实时拉数据
+
 type Props = { params: { name: string } };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
