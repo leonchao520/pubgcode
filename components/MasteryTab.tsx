@@ -3,28 +3,11 @@
 import { useState } from "react";
 import type { QueryResult } from "@/lib/query";
 import type { WeaponMastery } from "@/lib/pubg";
-import { getSurvivalLevel } from "./PlayerHelpers";
 import { getWeaponCategory, getWeaponName, getMasteryTierLabel, WEAPON_CATEGORIES, type WeaponCategory } from "@/lib/weapon-categories";
 
 /* ═══════════════════════════════════════════
-   精通 Tab — 生存专精 + 武器专精（分类 + 卡片 + 详情弹窗）
+   精通 Tab — 武器专精（分类 + 卡片 + 详情弹窗）
    ═══════════════════════════════════════════ */
-
-/* ─── 进度条 ──────────────────────────── */
-function Bar({ label, value, max, unit, color }: { label: string; value: number; max: number; unit: string; color: string }) {
-  const pct = Math.min((value / Math.max(max, 1)) * 100, 100);
-  return (
-    <div style={{ marginBottom: "10px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
-        <span style={{ fontSize: "11px", color: "#A3A3A3" }}>{label}</span>
-        <span style={{ fontSize: "11px", fontWeight: 600, color }}>{value.toLocaleString()}{unit}</span>
-      </div>
-      <div style={{ height: "4px", background: "rgba(255,255,255,0.06)", borderRadius: "2px", overflow: "hidden" }}>
-        <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: "2px", transition: "width 0.3s" }} />
-      </div>
-    </div>
-  );
-}
 
 /* ─── 武器详情弹窗 ─────────────────────── */
 function WeaponDetailModal({ weapon, onClose }: { weapon: WeaponMastery; onClose: () => void }) {
@@ -33,25 +16,26 @@ function WeaponDetailModal({ weapon, onClose }: { weapon: WeaponMastery; onClose
 
   const rows = [
     { label: "累计淘汰玩家", value: weapon.kills.toLocaleString() },
-    { label: "累计击倒玩家", value: (weapon as any).dbnoTotal?.toLocaleString() || "0" },
+    { label: "累计击倒玩家", value: (weapon.dbnoTotal || 0).toLocaleString() },
     { label: "累计造成伤害", value: weapon.damageTotal.toLocaleString() },
     { label: "累计爆头次数", value: weapon.headshots.toLocaleString() },
     { label: "单局最多淘汰", value: weapon.mostDefeatsInGame.toLocaleString() },
+    { label: "单局最多击倒", value: (weapon.mostDbnoInGame || 0).toLocaleString() },
     { label: "最远淘汰距离", value: `${weapon.longestDefeat}m` },
     { label: "累计命中次数", value: weapon.hitsTotal.toLocaleString() },
     { label: "命中率", value: `${weapon.hitRatio || 0}%` },
     { label: "总开火次数", value: weapon.shotsFired.toLocaleString() },
+    { label: "累计淘汰", value: weapon.defeats.toLocaleString() },
   ];
 
   return (
     <div style={md.overlay} onClick={onClose}>
       <div style={md.modal} onClick={e => e.stopPropagation()}>
-        {/* 头部 */}
         <div style={md.head}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={md.icon}>
               <img
-                src={`https://pubg-static.akamaized.net/gameassets/Weapons/Item_Weapon_${weapon.weaponId.toLowerCase().replace("weapon_","").replace("_c","")}.png`}
+                src={`https://pubg-static.akamaized.net/gameassets/Weapons/${weapon.weaponId}.png`}
                 alt=""
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
                 onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -64,8 +48,6 @@ function WeaponDetailModal({ weapon, onClose }: { weapon: WeaponMastery; onClose
           </div>
           <button onClick={onClose} style={md.closeBtn}>✕</button>
         </div>
-
-        {/* 详情表格 */}
         <div style={md.body}>
           {rows.map((r, i) => (
             <div key={i} style={md.row}>
@@ -84,27 +66,24 @@ function WeaponDetailModal({ weapon, onClose }: { weapon: WeaponMastery; onClose
    ═══════════════════════════════════════════ */
 
 export default function MasteryTab({ result }: { result: QueryResult }) {
-  const { survivalMastery, weaponMastery } = result;
-  const survival = survivalMastery;
+  const { weaponMastery } = result;
   const weapons: WeaponMastery[] = weaponMastery || [];
 
   const [filter, setFilter] = useState<WeaponCategory | "all">("all");
   const [selectedWeapon, setSelectedWeapon] = useState<WeaponMastery | null>(null);
 
-  if (!survival && weapons.length === 0) {
+  if (weapons.length === 0) {
     return (
       <div style={ms.empty}>
         <div style={{ fontSize: "24px", marginBottom: "8px" }}>🔒</div>
-        <div style={{ fontSize: "13px", color: "#A3A3A3" }}>暂无专精数据</div>
-        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>首次查询后缓存 24 小时，稍后再试</div>
+        <div style={{ fontSize: "14px", color: "#A3A3A3", marginBottom: "4px" }}>暂无武器专精数据</div>
+        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>PUBG API 限流中，请稍后刷新重试</div>
       </div>
     );
   }
 
-  const survivalInfo = survival ? getSurvivalLevel(survival.xp) : null;
-
   // 按分类过滤武器
-  const allWeapons = weapons.sort((a, b) => b.kills - a.kills);
+  const allWeapons = [...weapons].sort((a, b) => b.kills - a.kills);
   const filteredWeapons = filter === "all"
     ? allWeapons
     : allWeapons.filter(w => getWeaponCategory(w.weaponId) === filter);
@@ -118,145 +97,95 @@ export default function MasteryTab({ result }: { result: QueryResult }) {
 
   return (
     <div style={ms.wrap}>
-      {/* ─── 生存专精 ──────────────── */}
-      {survival && (
-        <div style={ms.card}>
-          <div style={ms.header}>
-            <span>🧟 生存专精</span>
-            <span style={ms.headerMeta}>{survival.totalMatchesPlayed.toLocaleString()} 场</span>
-          </div>
-
-          <div style={{ padding: "16px", display: "flex", alignItems: "center", gap: "16px" }}>
-            <div style={{
-              width: "64px", height: "64px", borderRadius: "16px",
-              background: "linear-gradient(135deg, #22D3EE, #0891B2)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              flexShrink: 0,
-            }}>
-              <div style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "20px", fontWeight: 700, color: "#fff", lineHeight: 1 }}>{survival.level}</div>
-                <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.7)" }}>Lv.</div>
-              </div>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: "16px", fontWeight: 700, color: "#fff" }}>
-                {survivalInfo?.title || "未定级"}
-              </div>
-              <div style={{ fontSize: "12px", color: "#A3A3A3", marginTop: "2px" }}>
-                XP {survival.xp.toLocaleString()} · Tier {survival.tier}
-              </div>
-              <div style={{ marginTop: "8px", height: "4px", background: "rgba(255,255,255,0.08)", borderRadius: "2px", overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${((survival.level % 100) / 100) * 100}%`, background: "#22D3EE", borderRadius: "2px" }} />
-              </div>
-            </div>
-          </div>
-
-          {survival.stats && (
-            <div style={{ padding: "0 16px 14px" }}>
-              <Bar label="总伤害" value={survival.stats.damageDealt || 0} max={500000} unit="" color="#E6B849" />
-              <Bar label="承受伤害" value={survival.stats.damageTaken || 0} max={500000} unit="" color="#f87171" />
-              <Bar label="徒步距离" value={Math.round((survival.stats.distanceOnFoot || 0) / 1000)} max={1000} unit="km" color="#4ade80" />
-              <Bar label="载具距离" value={Math.round((survival.stats.distanceByVehicle || 0) / 1000)} max={2000} unit="km" color="#60a5fa" />
-              <Bar label="游泳距离" value={Math.round((survival.stats.distanceBySwimming || 0) / 1000)} max={10} unit="km" color="#22d3ee" />
-              <Bar label="治疗次数" value={survival.stats.heals || 0} max={5000} unit="" color="#f0c040" />
-              <Bar label="强化次数" value={survival.stats.boosts || 0} max={5000} unit="" color="#c4a6ff" />
-              <Bar label="载具摧毁" value={survival.stats.vehiclesDestroyed || 0} max={100} unit="" color="#f472b6" />
-            </div>
-          )}
-        </div>
-      )}
-
       {/* ─── 武器专精 ──────────────── */}
-      {weapons.length > 0 && (
-        <div style={ms.card}>
-          <div style={ms.header}>
-            <span>🔫 武器专精</span>
-            <span style={ms.headerMeta}>{weapons.length} 种武器</span>
-          </div>
+      <div style={ms.card}>
+        <div style={ms.header}>
+          <span>🔫 武器精通</span>
+          <span style={ms.headerMeta}>{weapons.length} 种武器</span>
+        </div>
 
-          {/* 分类筛选栏 */}
-          <div style={ms.filterBar}>
-            <button
-              onClick={() => setFilter("all")}
-              style={{ ...ms.filterBtn, ...(filter === "all" ? ms.filterBtnActive : {}) }}
-            >
-              全部 ({weapons.length})
-            </button>
-            {WEAPON_CATEGORIES.map(cat => {
-              const count = catCounts[cat.key] || 0;
-              if (count === 0) return null;
+        {/* 分类筛选栏 */}
+        <div style={ms.filterBar}>
+          <button
+            onClick={() => setFilter("all")}
+            style={{ ...ms.filterBtn, ...(filter === "all" ? ms.filterBtnActive : {}) }}
+          >
+            全部 ({weapons.length})
+          </button>
+          {WEAPON_CATEGORIES.map(cat => {
+            const count = catCounts[cat.key] || 0;
+            if (count === 0) return null;
+            return (
+              <button
+                key={cat.key}
+                onClick={() => setFilter(cat.key)}
+                style={{ ...ms.filterBtn, ...(filter === cat.key ? ms.filterBtnActive : {}) }}
+              >
+                {cat.label} ({count})
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 武器卡片网格 */}
+        {filteredWeapons.length > 0 ? (
+          <div style={ms.weaponGrid}>
+            {filteredWeapons.map(w => {
+              const name = getWeaponName(w.weaponId);
+              const tierLabel = getMasteryTierLabel(w.tier);
+              const imgUrl = `https://pubg-static.akamaized.net/gameassets/Weapons/${w.weaponId}.png`;
               return (
-                <button
-                  key={cat.key}
-                  onClick={() => setFilter(cat.key)}
-                  style={{ ...ms.filterBtn, ...(filter === cat.key ? ms.filterBtnActive : {}) }}
+                <div
+                  key={w.weaponId}
+                  style={ms.weaponCard}
+                  onClick={() => setSelectedWeapon(w)}
                 >
-                  {cat.label} ({count})
-                </button>
+                  <div style={ms.weaponIcon}>
+                    <img
+                      src={imgUrl}
+                      alt={name}
+                      style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                      onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                  </div>
+                  <div style={ms.weaponInfo}>
+                    <div style={ms.weaponName}>{name}</div>
+                    <div style={ms.weaponMeta}>
+                      {w.kills.toLocaleString()} 淘汰 · {w.longestDefeat}m
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <div style={ms.weaponLevel}>{tierLabel}</div>
+                    <div style={ms.weaponLv}>Lv.{w.level}</div>
+                  </div>
+                </div>
               );
             })}
           </div>
+        ) : (
+          <div style={{ padding: "40px 0", textAlign: "center", color: "#A3A3A3", fontSize: "13px" }}>
+            该分类暂无武器数据
+          </div>
+        )}
 
-          {/* 武器卡片网格 */}
-          {filteredWeapons.length > 0 ? (
-            <div style={ms.weaponGrid}>
-              {filteredWeapons.map(w => {
-                const name = getWeaponName(w.weaponId);
-                const tierLabel = getMasteryTierLabel(w.tier);
-                const imgUrl = `https://pubg-static.akamaized.net/gameassets/Weapons/Item_Weapon_${w.weaponId.toLowerCase().replace("weapon_","").replace("_c","")}.png`;
-                return (
-                  <div
-                    key={w.weaponId}
-                    style={ms.weaponCard}
-                    onClick={() => setSelectedWeapon(w)}
-                  >
-                    <div style={ms.weaponIcon}>
-                      <img
-                        src={imgUrl}
-                        alt={name}
-                        style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                        onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
-                      />
-                    </div>
-                    <div style={ms.weaponInfo}>
-                      <div style={ms.weaponName}>{name}</div>
-                      <div style={ms.weaponMeta}>
-                        {w.kills.toLocaleString()} 淘汰 · {w.longestDefeat}m
-                      </div>
-                    </div>
-                    <div style={{ textAlign: "right", flexShrink: 0 }}>
-                      <div style={ms.weaponLevel}>{tierLabel}</div>
-                      <div style={ms.weaponLv}>Lv.{w.level}</div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div style={{ padding: "40px 0", textAlign: "center", color: "#A3A3A3", fontSize: "13px" }}>
-              该分类暂无武器数据
-            </div>
-          )}
-
-          {/* 武器总数统计 */}
-          <div style={ms.footer}>
-            <div style={{ display: "flex", gap: "16px" }}>
-              <span style={ms.footerStat}>
-                <span style={{ color: "#E6B849" }}>{allWeapons.reduce((s, w) => s + w.kills, 0).toLocaleString()}</span>
-                <span style={{ color: "#A3A3A3", marginLeft: "4px" }}>总淘汰</span>
-              </span>
-              <span style={ms.footerStat}>
-                <span style={{ color: "#E6B849" }}>{allWeapons.length}</span>
-                <span style={{ color: "#A3A3A3", marginLeft: "4px" }}>种武器</span>
-              </span>
-              <span style={ms.footerStat}>
-                <span style={{ color: "#E6B849" }}>{allWeapons.reduce((s, w) => s + w.damageTotal, 0).toLocaleString()}</span>
-                <span style={{ color: "#A3A3A3", marginLeft: "4px" }}>总伤害</span>
-              </span>
-            </div>
+        {/* 武器总数统计 */}
+        <div style={ms.footer}>
+          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+            <span style={ms.footerStat}>
+              <span style={{ color: "#E6B849" }}>{allWeapons.reduce((s, w) => s + w.kills, 0).toLocaleString()}</span>
+              <span style={{ color: "#A3A3A3", marginLeft: "4px" }}>总淘汰</span>
+            </span>
+            <span style={ms.footerStat}>
+              <span style={{ color: "#E6B849" }}>{allWeapons.length}</span>
+              <span style={{ color: "#A3A3A3", marginLeft: "4px" }}>种武器</span>
+            </span>
+            <span style={ms.footerStat}>
+              <span style={{ color: "#E6B849" }}>{allWeapons.reduce((s, w) => s + w.damageTotal, 0).toLocaleString()}</span>
+              <span style={{ color: "#A3A3A3", marginLeft: "4px" }}>总伤害</span>
+            </span>
           </div>
         </div>
-      )}
+      </div>
 
       {/* ─── 武器详情弹窗 ──────────── */}
       {selectedWeapon && (
@@ -288,10 +217,9 @@ const ms: Record<string, React.CSSProperties> = {
 
   empty: {
     background: "#1E1E1E", border: "1px solid #333333",
-    borderRadius: "8px", padding: "32px", textAlign: "center",
+    borderRadius: "8px", padding: "40px 20px", textAlign: "center",
   },
 
-  // 分类筛选
   filterBar: {
     display: "flex", gap: "2px", borderBottom: "1px solid #333333",
     padding: "6px 8px", overflowX: "auto",
@@ -308,13 +236,11 @@ const ms: Record<string, React.CSSProperties> = {
     background: "rgba(230,184,73,0.08)",
   } as React.CSSProperties,
 
-  // 武器网格
   weaponGrid: {
     display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px",
     padding: "14px",
   },
 
-  // 武器卡片
   weaponCard: {
     background: "rgba(255,255,255,0.02)",
     border: "1px solid #333333", borderRadius: "8px",
@@ -353,7 +279,6 @@ const ms: Record<string, React.CSSProperties> = {
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
 
-  // 底部统计
   footer: {
     padding: "12px 16px", borderTop: "1px solid #333333",
     display: "flex", alignItems: "center",
@@ -363,8 +288,6 @@ const ms: Record<string, React.CSSProperties> = {
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
 };
-
-/* ─── 弹窗样式 ────────────────────────── */
 
 const md: Record<string, React.CSSProperties> = {
   overlay: {
