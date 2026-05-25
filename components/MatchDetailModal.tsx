@@ -64,8 +64,8 @@ export default function MatchDetailModal({ match, onClose }: { match: MatchSumma
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: "4px",
                 padding: "2px 8px", borderRadius: "4px",
-                background: MAP_INFO[match.mapName]?.color ? `${MAP_INFO[match.mapName].color}20` : "rgba(255,255,255,0.04)",
-                border: `1px solid ${MAP_INFO[match.mapName]?.color ? `${MAP_INFO[match.mapName].color}30` : "rgba(255,255,255,0.06)"}`,
+                background: MAP_INFO[match.mapName]?.color ? `${MAP_INFO[match.mapName].color}20` : "#333333",
+                border: `1px solid ${MAP_INFO[match.mapName]?.color ? `${MAP_INFO[match.mapName].color}30` : "#333333"}`,
               }}>
                 <span>{MAP_INFO[match.mapName]?.emoji || "🗺️"}</span>
                 <span style={{ color: MAP_INFO[match.mapName]?.color || "rgba(255,255,255,0.5)", fontWeight: 500 }}>
@@ -168,14 +168,14 @@ const md = {
   } as React.CSSProperties,
 
   modal: {
-    background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E", border: "1px solid #333333",
     borderRadius: "14px", width: "100%", maxWidth: "600px",
     maxHeight: "90vh", overflow: "auto",
   } as React.CSSProperties,
 
   head: {
     display: "flex", alignItems: "flex-start", justifyContent: "space-between",
-    padding: "20px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)",
+    padding: "20px 20px 16px", borderBottom: "1px solid #333333",
   } as React.CSSProperties,
 
   headTitle: { fontSize: "20px", fontWeight: 700, color: "#fff" },
@@ -188,15 +188,15 @@ const md = {
 
   kpiGrid: {
     padding: "16px 20px",
-    borderBottom: "1px solid rgba(255,255,255,0.04)",
+    borderBottom: "1px solid #333333",
   } as React.CSSProperties,
   kpiBox: {
-    background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)",
+    background: "rgba(255,255,255,0.02)", border: "1px solid #333333",
     borderRadius: "8px", padding: "12px 8px", textAlign: "center",
   } as React.CSSProperties,
 
   section: {
-    padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)",
+    padding: "14px 20px", borderBottom: "1px solid #333333",
   } as React.CSSProperties,
   sectionTitle: { fontSize: "11px", fontWeight: 600, color: "rgba(255,255,255,0.5)", marginBottom: "10px", letterSpacing: "0.5px" },
 
@@ -212,7 +212,7 @@ const md = {
   teamHdr: {
     display: "flex", alignItems: "center", padding: "6px 0",
     fontSize: "10px", color: "rgba(255,255,255,0.4)", letterSpacing: "0.5px",
-    borderBottom: "1px solid rgba(255,255,255,0.04)",
+    borderBottom: "1px solid #333333",
   } as React.CSSProperties,
   teamRow: {
     display: "flex", alignItems: "center", padding: "8px 0",

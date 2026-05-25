@@ -41,11 +41,11 @@ export default function ResultCard({ result, onSeasonChange }: { result: QueryRe
             </div>
           </div>
           <div style={{ padding: "16px 20px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)", borderRadius: "6px", padding: "10px 12px", textAlign: "center" }}>
+            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid #333333", borderRadius: "6px", padding: "10px 12px", textAlign: "center" }}>
               <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.45)", marginBottom: "4px" }}>PUBG 总时长</div>
               <div style={{ fontSize: "22px", fontWeight: 700, color: "#60a5fa" }}>{Math.floor(steam.pubgPlaytimeMinutes / 60).toLocaleString()}h</div>
             </div>
-            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)", borderRadius: "6px", padding: "10px 12px", textAlign: "center" }}>
+            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid #333333", borderRadius: "6px", padding: "10px 12px", textAlign: "center" }}>
               <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.45)", marginBottom: "4px" }}>近 14 天</div>
               <div style={{ fontSize: "22px", fontWeight: 700, color: "#60a5fa" }}>{Math.floor(steam.pubgPlaytime2wMinutes / 60)}h</div>
             </div>
@@ -129,8 +129,8 @@ export default function ResultCard({ result, onSeasonChange }: { result: QueryRe
 
 const st = {
   card: {
-    background: "#0d0d0d",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E",
+    border: "1px solid #333333",
     borderRadius: "8px",
     overflow: "hidden",
   } as React.CSSProperties,
@@ -138,7 +138,7 @@ const st = {
   cardHeader: {
     display: "flex", alignItems: "center", justifyContent: "space-between",
     padding: "16px 20px",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
+    borderBottom: "1px solid #333333",
   } as React.CSSProperties,
 
   cardHeaderLeft: { display: "flex", alignItems: "center", gap: "12px" } as React.CSSProperties,
@@ -177,14 +177,14 @@ const st = {
   steamRow: {
     display: "flex", alignItems: "center", gap: "8px",
     padding: "10px 20px",
-    borderBottom: "1px solid rgba(255,255,255,0.04)",
+    borderBottom: "1px solid #333333",
     background: "rgba(255,255,255,0.01)",
     fontSize: "12px",
   } as React.CSSProperties,
 
   steamLabel: { color: "rgba(255,255,255,0.4)", fontSize: "11px" } as React.CSSProperties,
   steamName: { color: "rgba(255,255,255,0.6)", fontSize: "12px" } as React.CSSProperties,
-  steamDivider: { width: "1px", height: "12px", background: "rgba(255,255,255,0.08)" } as React.CSSProperties,
+  steamDivider: { width: "1px", height: "12px", background: "#333333" } as React.CSSProperties,
   steamLink: {
     marginLeft: "auto", color: "rgba(255,255,255,0.45)", fontSize: "11px",
     textDecoration: "none",

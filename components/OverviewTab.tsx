@@ -216,8 +216,8 @@ function timeAgo(dateStr: string) {
 const st: Record<string, any> = {
   wrap: { display: "flex", flexDirection: "column", gap: "12px" } as React.CSSProperties,
   card: {
-    background: "#0d0d0d",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E",
+    border: "1px solid #333333",
     borderRadius: "8px",
     overflow: "hidden",
   } as React.CSSProperties,
@@ -247,7 +247,7 @@ const st: Record<string, any> = {
   lastActive: {
     padding: "8px 20px 12px",
     fontSize: "11px", color: "rgba(255,255,255,0.5)",
-    borderTop: "1px solid rgba(255,255,255,0.04)",
+    borderTop: "1px solid #333333",
   } as React.CSSProperties,
 
   tierBadge: {
@@ -265,7 +265,7 @@ const st: Record<string, any> = {
   sectionTitle: {
     display: "flex", alignItems: "center", gap: "10px",
     padding: "14px 20px",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
+    borderBottom: "1px solid #333333",
     fontSize: "13px", fontWeight: 600, color: "#fff",
   } as React.CSSProperties,
   accentBar: { width: "2px", height: "16px", background: "#E6B849", borderRadius: "1px" } as React.CSSProperties,

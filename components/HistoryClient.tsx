@@ -266,7 +266,7 @@ const s: Record<string, React.CSSProperties | any> = {
   wrap: { display: "flex", flexDirection: "column", gap: "16px" },
   statsGrid: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "10px" },
   statCard: {
-    background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E", border: "1px solid #333333",
     borderRadius: "8px", padding: "14px 16px", textAlign: "center",
   },
   statLabel: { fontSize: "10px", color: "rgba(255,255,255,0.45)", letterSpacing: "1px", marginBottom: "4px" },
@@ -274,14 +274,14 @@ const s: Record<string, React.CSSProperties | any> = {
 
   filterRow: { display: "flex", gap: "8px" },
   filterInput: {
-    flex: 1, padding: "10px 14px", background: "#0d0d0d", color: "#fff",
+    flex: 1, padding: "10px 14px", background: "#1E1E1E", color: "#fff",
     border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px",
     fontSize: "13px", outline: "none",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
   filterBtn: {
-    padding: "10px 14px", background: "#0d0d0d", color: "rgba(255,255,255,0.4)",
-    border: "1px solid rgba(255,255,255,0.08)", borderRadius: "6px",
+    padding: "10px 14px", background: "#1E1E1E", color: "rgba(255,255,255,0.4)",
+    border: "1px solid #333333", borderRadius: "6px",
     fontSize: "12px", cursor: "pointer",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
@@ -299,18 +299,18 @@ const s: Record<string, React.CSSProperties | any> = {
 
   listCount: { fontSize: "11px", color: "rgba(255,255,255,0.4)" },
   emptyCard: {
-    background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E", border: "1px solid #333333",
     borderRadius: "8px", padding: "40px", textAlign: "center",
     fontSize: "13px", color: "rgba(255,255,255,0.5)",
   },
 
   tableCard: {
-    background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E", border: "1px solid #333333",
     borderRadius: "8px", overflow: "hidden",
   },
   tableHdr: {
     display: "flex", padding: "10px 16px",
-    borderBottom: "1px solid rgba(255,255,255,0.06)",
+    borderBottom: "1px solid #333333",
     fontSize: "10px", color: "rgba(255,255,255,0.4)", letterSpacing: "1px",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
@@ -331,8 +331,8 @@ const s: Record<string, React.CSSProperties | any> = {
   } as React.CSSProperties,
 
   pageBtn: {
-    padding: "6px 14px", background: "#0d0d0d", color: "rgba(255,255,255,0.4)",
-    border: "1px solid rgba(255,255,255,0.08)", borderRadius: "6px",
+    padding: "6px 14px", background: "#1E1E1E", color: "rgba(255,255,255,0.4)",
+    border: "1px solid #333333", borderRadius: "6px",
     fontSize: "12px", cursor: "pointer",
   },
 

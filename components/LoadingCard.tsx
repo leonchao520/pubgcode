@@ -3,7 +3,7 @@ export default function LoadingCard() {
     <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
       {/* 结果卡片骨架 */}
       <div style={s.card}>
-        <div style={{ ...s.row, borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "16px 20px" }}>
+        <div style={{ ...s.row, borderBottom: "1px solid #333333", padding: "16px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ width: "2px", height: "20px", background: "rgba(230,184,73,0.3)", borderRadius: "1px" }} />
             <div style={{ width: "60px", height: "14px", background: "rgba(255,255,255,0.06)", borderRadius: "4px" }} />
@@ -15,7 +15,7 @@ export default function LoadingCard() {
 
       {/* 战绩骨架 */}
       <div style={s.card}>
-        <div style={{ ...s.row, borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "14px 20px" }}>
+        <div style={{ ...s.row, borderBottom: "1px solid #333333", padding: "14px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <div style={{ width: "2px", height: "16px", background: "rgba(230,184,73,0.3)", borderRadius: "1px" }} />
             <div style={{ width: "100px", height: "13px", background: "rgba(255,255,255,0.05)", borderRadius: "4px" }} />
@@ -44,7 +44,7 @@ export default function LoadingCard() {
 
 const s = {
   card: {
-    background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E", border: "1px solid #333333",
     borderRadius: "8px", overflow: "hidden",
   } as React.CSSProperties,
 

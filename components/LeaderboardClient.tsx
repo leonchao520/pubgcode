@@ -236,7 +236,7 @@ const lg = {
   selectors: {
     display: "flex", flexDirection: "column", gap: "12px",
     marginBottom: "20px", padding: "16px",
-    background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px",
+    background: "#1E1E1E", border: "1px solid #333333", borderRadius: "10px",
   } as React.CSSProperties,
   selectorGroup: {
     display: "flex", alignItems: "center", gap: "12px",
@@ -244,7 +244,7 @@ const lg = {
   selectorLabel: { fontSize: "12px", color: "rgba(255,255,255,0.5)", minWidth: "36px", flexShrink: 0 } as React.CSSProperties,
   btn: {
     padding: "5px 12px", background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.5)",
-    border: "1px solid rgba(255,255,255,0.06)", borderRadius: "6px", fontSize: "12px",
+    border: "1px solid #333333", borderRadius: "6px", fontSize: "12px",
     cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   } as React.CSSProperties,
   btnActive: {
@@ -257,7 +257,7 @@ const lg = {
     display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px",
   } as React.CSSProperties,
   podiumCard: {
-    background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E", border: "1px solid #333333",
     borderRadius: "10px", padding: "20px 14px", textAlign: "center",
     display: "flex", flexDirection: "column", alignItems: "center", gap: "8px",
   } as React.CSSProperties,
@@ -266,12 +266,12 @@ const lg = {
   podiumRp: { fontSize: "16px", fontWeight: 700, color: "#E6B849" } as React.CSSProperties,
   podiumStats: { display: "flex", flexDirection: "column", gap: "2px", fontSize: "11px", color: "rgba(255,255,255,0.45)" } as React.CSSProperties,
   listCard: {
-    background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)",
+    background: "#1E1E1E", border: "1px solid #333333",
     borderRadius: "10px", overflow: "hidden",
   } as React.CSSProperties,
   listHeader: {
     display: "flex", alignItems: "center", gap: "8px",
-    padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)",
+    padding: "12px 20px", borderBottom: "1px solid #333333",
     fontSize: "11px", color: "rgba(255,255,255,0.4)", fontWeight: 600,
     letterSpacing: "0.5px",
   } as React.CSSProperties,
