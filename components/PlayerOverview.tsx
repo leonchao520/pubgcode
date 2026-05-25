@@ -169,15 +169,19 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
     <>
     <div style={st.page}>
       <div style={st.container}>
-        {/* ─── 搜索栏 ──────────────── */}
-        <div style={st.searchWrap}>
+        {/* ─── Logo ──────────────── */}
+        <div style={st.logoRow}>
           <a href="/" style={st.logoLink} title="PUBG.BAR 首页">
-            <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+            <svg width="26" height="26" viewBox="0 0 20 20" fill="none">
               <path d="M10 1L1 6v8l9 5 9-5V6L10 1z" stroke="#E6B849" strokeWidth="1.5" fill="none"/>
               <circle cx="10" cy="10" r="3" stroke="#E6B849" strokeWidth="1.5" fill="none"/>
             </svg>
             <span style={st.logoText}>PUBG<span style={{color:"#E6B849"}}>.</span>BAR</span>
           </a>
+        </div>
+
+        {/* ─── 搜索栏 ──────────────── */}
+        <div style={st.searchWrap}>
           <div style={st.searchBox}>
             <svg style={st.searchIcon} width="16" height="16" viewBox="0 0 16 16" fill="none">
               <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.5"/>
@@ -531,25 +535,31 @@ const st: Record<string, React.CSSProperties> = {
     display: "flex", flexDirection: "column", gap: "12px",
   },
 
+  // Logo 行
+  logoRow: {
+    display: "flex", justifyContent: "center",
+    marginBottom: "16px",
+  } as React.CSSProperties,
+
   // 搜索栏
   searchWrap: {
-    display: "flex", alignItems: "center", gap: "10px",
-    marginBottom: "8px",
-  },
+    display: "flex", justifyContent: "center",
+    marginBottom: "8px", width: "100%",
+  } as React.CSSProperties,
   logoLink: {
     display: "flex", alignItems: "center", gap: "8px",
     color: "#fff", textDecoration: "none", flexShrink: 0,
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   } as React.CSSProperties,
   logoText: {
-    fontSize: "16px", fontWeight: 700, letterSpacing: "-0.3px",
+    fontSize: "20px", fontWeight: 700, letterSpacing: "-0.3px",
   } as React.CSSProperties,
   backLink: {
     color: "rgba(255,255,255,0.4)", display: "flex", alignItems: "center",
     textDecoration: "none", flexShrink: 0,
   },
   searchBox: {
-    flex: 1, position: "relative", maxWidth: "600px",
+    width: "100%", position: "relative",
   },
   searchIcon: {
     position: "absolute", left: "14px", top: "50%",
@@ -559,7 +569,7 @@ const st: Record<string, React.CSSProperties> = {
   searchInput: {
     width: "100%", padding: "14px 110px 14px 42px",
     backgroundColor: "#1E1E1E", color: "#fff",
-    border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px",
+    border: "1px solid #333333", borderRadius: "10px",
     fontSize: "15px", outline: "none", boxSizing: "border-box",
   },
 
