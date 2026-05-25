@@ -614,7 +614,7 @@ export async function fetchLeaderboard(
       };
     })
     // 按排名升序（#1 在前）
-    .sort((a, b) => a.rank - b.rank);
+    .sort((a: LeaderboardPlayer, b: LeaderboardPlayer) => a.rank - b.rank);
 
   return {
     shardId: data.attributes?.shardId || shard,
