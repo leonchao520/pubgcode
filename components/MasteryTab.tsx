@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { QueryResult } from "@/lib/query";
 import type { WeaponMastery } from "@/lib/pubg";
-import { getWeaponCategory, getWeaponName, getMasteryTierLabel, WEAPON_CATEGORIES, type WeaponCategory } from "@/lib/weapon-categories";
+import { getWeaponCategory, getWeaponName, getWeaponEmoji, getMasteryTierLabel, WEAPON_CATEGORIES, type WeaponCategory } from "@/lib/weapon-categories";
 
 /* ═══════════════════════════════════════════
    精通 Tab — 武器专精（分类 + 卡片 + 详情弹窗）
@@ -129,11 +129,11 @@ export default function MasteryTab({ result }: { result: QueryResult }) {
 
         {/* 武器卡片网格 */}
         {filteredWeapons.length > 0 ? (
-          <div style={ms.weaponGrid}>
+          <div className="weapon-grid-resp">
             {filteredWeapons.map(w => {
               const name = getWeaponName(w.weaponId);
+              const emoji = getWeaponEmoji(w.weaponId);
               const tierLabel = getMasteryTierLabel(w.tier);
-              const imgUrl = `https://pubg-static.akamaized.net/gameassets/Weapons/${w.weaponId}.png`;
               return (
                 <div
                   key={w.weaponId}
@@ -141,12 +141,7 @@ export default function MasteryTab({ result }: { result: QueryResult }) {
                   onClick={() => setSelectedWeapon(w)}
                 >
                   <div style={ms.weaponIcon}>
-                    <img
-                      src={imgUrl}
-                      alt={name}
-                      style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                      onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
-                    />
+                    <span style={{ fontSize: "24px" }}>{emoji}</span>
                   </div>
                   <div style={ms.weaponInfo}>
                     <div style={ms.weaponName}>{name}</div>
@@ -249,10 +244,9 @@ const ms: Record<string, React.CSSProperties> = {
   },
 
   weaponIcon: {
-    width: "48px", height: "38px", borderRadius: "6px",
+    width: "44px", height: "36px", borderRadius: "6px",
     background: "rgba(255,255,255,0.04)",
-    flexShrink: 0, overflow: "hidden",
-    display: "flex", alignItems: "center", justifyContent: "center",
+    flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
   },
 
   weaponInfo: { flex: 1, minWidth: 0 },

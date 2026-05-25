@@ -117,6 +117,24 @@ code, pre, .font-mono {
   }
 }
 
+/* 移动端 Tab 导航栏滚动 */
+.tab-bar-resp {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #333333;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.tab-bar-resp::-webkit-scrollbar { display: none; }
+@media (max-width: 480px) {
+  .tab-bar-resp button {
+    padding: 12px 18px !important;
+    font-size: 12px !important;
+    white-space: nowrap;
+  }
+}
+
 /* ─── 响应式容器 ────────────────────────── */
 .app-container {
   width: 100%;
@@ -179,7 +197,34 @@ code, pre, .font-mono {
   }
 }
 
-/* 历史页搜索栏 */
+/* 武器网格响应式 */
+.weapon-grid-resp {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 14px;
+}
+@media (max-width: 768px) {
+  .weapon-grid-resp { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .weapon-grid-resp { grid-template-columns: 1fr; gap: 8px; padding: 10px; }
+}
+
+/* 武器筛选栏响应式 */
+.weapon-filter-resp {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid #333333;
+  padding: 6px 8px;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.weapon-filter-resp::-webkit-scrollbar { display: none; }
+@media (max-width: 480px) {
+  .weapon-filter-resp { padding: 4px 6px; gap: 0; }
+}
 .filter-row {
   display: flex;
   flex-wrap: wrap;

@@ -197,7 +197,7 @@ export default function PlayerOverview({ initialName, initialResult }: Props) {
         </div>
 
         {/* ─── Tab 栏 ──────────────── */}
-        <div style={st.tabBar}>
+        <div className="tab-bar-resp" style={st.tabBar}>
           {tabs.map(t => (
             <button
               key={t}
